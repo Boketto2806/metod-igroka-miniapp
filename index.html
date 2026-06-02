@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Метод Игрока</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0f0f13; color: #e8e8f0; font-family: -apple-system, sans-serif; }
+.header { background: #16161e; padding: 16px; border-bottom: 1px solid #2a2a3a; display: flex; align-items: center; gap: 12px; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; background: #534AB7; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; color: #CECBF6; }
+.username { font-size: 15px; font-weight: 600; }
+.level { font-size: 12px; color: #9b8fd4; margin-top: 2px; }
+.streak { background: #1e1a2e; border: 1px solid #534AB7; border-radius: 20px; padding: 6px 12px; font-size: 13px; color: #AFA9EC; margin-left: auto; }
+.content { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.block { background: #16161e; border-radius: 12px; padding: 14px; border: 1px solid #2a2a3a; }
+.xp-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: #6b6b80; }
+.xp-val { color: #AFA9EC; font-weight: 500; }
+.bar-bg { background: #1e1e2e; border-radius: 6px; height: 10px; }
+.bar-fill { background: #534AB7; border-radius: 6px; height: 100%; transition: width 1s; }
+.xp-levels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: #6b6b80; }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat { background: #16161e; border-radius: 8px; padding: 12px; border: 1px solid #2a2a3a; }
+.stat-num { font-size: 22px; font-weight: 600; }
+.stat-lbl { font-size: 12px; color: #6b6b80; margin-top: 2px; }
+.purple { color: #AFA9EC; }
+.green { color: #5DCAA5; }
+.amber { color: #EF9F27; }
+.section-title { font-size: 11px; color: #6b6b80; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+.charts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.chart-block { background: #16161e; border-radius: 12px; padding: 14px; border: 1px solid #2a2a3a; }
+.chart-title { font-size: 11px; color: #6b6b80; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+.donut-wrap { position: relative; width: 90px; height: 90px; margin: 0 auto; }
+.legend { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #9b9bae; }
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.legend-val { margin-left: auto; font-weight: 500; color: #c8c8d8; }
+.quest { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #1e1e2e; cursor: pointer; }
+.quest:last-child { border-bottom: none; padding-bottom: 0; }
+.quest:first-child { padding-top: 0; }
+.cb { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid #3a3a50; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: all 0.2s; }
+.cb.done { background: #534AB7; border-color: #534AB7; }
+.qt { font-size: 14px; color: #c8c8d8; line-height: 1.4; }
+.qt.done { text-decoration: line-through; color: #6b6b80; }
+.qmeta { display: flex; gap: 8px; margin-top: 4px; }
+.proj { font-size: 11px; color: #534AB7; background: #1e1a2e; padding: 2px 8px; border-radius: 10px; }
+.xpbadge { font-size: 11px; color: #9b8fd4; }
+.tabs { display: flex; background: #16161e; border-top: 1px solid #2a2a3a; position: sticky; bottom: 0; }
+.tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; color: #6b6b80; cursor: pointer; border-top: 2px solid transparent; }
+.tab.active { color: #AFA9EC; border-top-color: #534AB7; }
+.hidden { display: none; }
+.xp-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0); background: #534AB7; color: #fff; padding: 12px 24px; border-radius: 12px; font-size: 16px; font-weight: 600; transition: all 0.3s; z-index: 100; }
+.xp-popup.show { transform: translate(-50%,-50%) scale(1); }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="avatar" id="av">РА</div>
+  <div>
+    <div class="username" id="uname">Загрузка...</div>
+    <div class="level" id="ulevel">Уровень 1</div>
+  </div>
+  <div class="streak" id="streak">🔥 0 дней</div>
+</div>
+
+<div id="page-today">
+<div class="content">
+  <div class="block">
+    <div class="xp-header"><span>Прогресс до следующего уровня</span><span class="xp-val" id="xpval">0 / 100 XP</span></div>
+    <div class="bar-bg"><div class="bar-fill" id="xpbar" style="width:0%"></div></div>
+    <div class="xp-levels"><span id="lvl-cur">Ур. 1</span><span id="xp-pct">0%</span><span id="lvl-next">Ур. 2</span></div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num purple" id="total-xp">0</div><div class="stat-lbl">Всего XP</div></div>
+    <div class="stat"><div class="stat-num green" id="total-q">0</div><div class="stat-lbl">Квестов закрыто</div></div>
+    <div class="stat"><div class="stat-num amber" id="cur-streak">0</div><div class="stat-lbl">Текущий streak</div></div>
+    <div class="stat"><div class="stat-num" id="best-streak">0</div><div class="stat-lbl">Лучший streak</div></div>
+  </div>
+
+  <div class="charts">
+    <div class="chart-block">
+      <div class="chart-title">По проектам</div>
+      <div class="donut-wrap"><canvas id="donut"></canvas></div>
+      <div class="legend">
+        <div class="legend-item"><div class="dot" style="background:#534AB7"></div>Метод Игрока<span class="legend-val" id="l1">0</span></div>
+        <div class="legend-item"><div class="dot" style="background:#1D9E75"></div>AI OFM<span class="legend-val" id="l2">0</span></div>
+        <div class="legend-item"><div class="dot" style="background:#EF9F27"></div>Другое<span class="legend-val" id="l3">0</span></div>
+      </div>
+    </div>
+    <div class="chart-block">
+      <div class="chart-title">XP за неделю</div>
+      <canvas id="barchart" height="140"></canvas>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="section-title">Квесты на сегодня</div>
+    <div id="quest-list"><div style="color:#6b6b80;font-size:14px">Квестов пока нет</div></div>
+  </div>
+</div>
+</div>
+
+<div id="page-history" class="hidden">
+  <div class="content">
+    <div class="block">
+      <div class="section-title">История квестов</div>
+      <div id="history-list"><div style="color:#6b6b80;font-size:14px">История пуста</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-achieve" class="hidden">
+  <div class="content">
+    <div class="block">
+      <div class="section-title">Достижения</div>
+      <div id="achieve-list"><div style="color:#6b6b80;font-size:14px">Достижений пока нет</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('today',this)">Сегодня</div>
+  <div class="tab" onclick="showTab('history',this)">История</div>
+  <div class="tab" onclick="showTab('achieve',this)">Ачивки</div>
+</div>
+
+<div class="xp-popup" id="popup"></div>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+const SUPABASE_URL = 'https://bvtymkmohytadgjlrjyt.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ2dHlta21vaHl0YWRnamxyanl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTY5NTYsImV4cCI6MjA5NTk3Mjk1Nn0.G-WpAfExuJHIv0eNKTcLUNtu8w7TeUMHKRN55HiXu90';
+
+function showTab(name, el) {
+  document.querySelectorAll('[id^="page-"]').forEach(p => p.classList.add('hidden'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.remove('hidden');
+  el.classList.add('active');
+}
+
+async function api(path, opts={}) {
+  const r = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', ...opts.headers },
+    ...opts
+  });
+  return r.json();
+}
+
+async function load() {
+  const tg = window.Telegram?.WebApp;
+  const userId = tg?.initDataUnsafe?.user?.id || 1912211200;
+  const firstName = tg?.initDataUnsafe?.user?.first_name || 'Игрок';
+
+  document.getElementById('av').textContent = firstName[0].toUpperCase();
+  document.getElementById('uname').textContent = firstName;
+  tg?.expand();
+
+  const players = await api('players?telegram_id=eq.' + userId + '&select=*');
+  if (!players.length) return;
+  const p = players[0];
+
+  document.getElementById('ulevel').textContent = 'Уровень ' + p.level;
+  document.getElementById('streak').textContent = '🔥 ' + p.streak + ' дней';
+  document.getElementById('xpval').textContent = p.xp + ' / ' + p.xp_to_next + ' XP';
+  const pct = Math.round(p.xp / p.xp_to_next * 100);
+  document.getElementById('xpbar').style.width = pct + '%';
+  document.getElementById('xp-pct').textContent = pct + '%';
+  document.getElementById('lvl-cur').textContent = 'Ур. ' + p.level;
+  document.getElementById('lvl-next').textContent = 'Ур. ' + (p.level + 1);
+  document.getElementById('total-xp').textContent = (p.xp + (p.level - 1) * 100).toLocaleString();
+  document.getElementById('cur-streak').textContent = p.streak;
+  document.getElementById('best-streak').textContent = p.best_streak;
+
+  const quests = await api('quests?player_id=eq.' + p.id + '&select=*&order=created_at.desc');
+  const active = quests.filter(q => q.status === 'active');
+  const done = quests.filter(q => q.status === 'completed');
+
+  document.getElementById('total-q').textContent = done.length;
+
+  const ql = document.getElementById('quest-list');
+  if (active.length) {
+    ql.innerHTML = active.map(q => `
+      <div class="quest" onclick="completeQuest(${q.id}, ${q.xp_reward}, ${p.id}, this)">
+        <div class="cb"></div>
+        <div style="flex:1">
+          <div class="qt">${q.title}</div>
+          <div class="qmeta"><span class="proj">${q.project || 'Общее'}</span><span class="xpbadge">+${q.xp_reward} XP</span></div>
+        </div>
+      </div>`).join('');
+  }
+
+  const hl = document.getElementById('history-list');
+  if (done.length) {
+    hl.innerHTML = done.map(q => `
+      <div class="quest">
+        <div class="cb done">✓</div>
+        <div style="flex:1">
+          <div class="qt done">${q.title}</div>
+          <div class="qmeta"><span class="proj">${q.project || 'Общее'}</span><span class="xpbadge">+${q.xp_reward} XP</span></div>
+        </div>
+      </div>`).join('');
+  }
+
+  const mi = quests.filter(q => q.project === 'Метод Игрока').length;
+  const ofm = quests.filter(q => q.project === 'AI OFM').length;
+  const other = quests.length - mi - ofm;
+  document.getElementById('l1').textContent = mi;
+  document.getElementById('l2').textContent = ofm;
+  document.getElementById('l3').textContent = other;
+
+  new Chart(document.getElementById('donut'), {
+    type: 'doughnut',
+    data: { datasets: [{ data: [mi||1, ofm||1, other||1], backgroundColor: ['#534AB7','#1D9E75','#EF9F27'], borderWidth: 0 }] },
+    options: { cutout: '72%', plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+  });
+
+  new Chart(document.getElementById('barchart'), {
+    type: 'bar',
+    data: {
+      labels: ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'],
+      datasets: [{ data: [120,180,90,200,150,70,40], backgroundColor: '#534AB7', borderRadius: 4 }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#6b6b80', font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: '#6b6b80', font: { size: 10 } }, grid: { color: '#1e1e2e' } } } }
+  });
+}
+
+async function completeQuest(questId, xpReward, playerId, el) {
+  el.querySelector('.cb').classList.add('done');
+  el.querySelector('.cb').textContent = '✓';
+  el.querySelector('.qt').classList.add('done');
+
+  await api('quests?id=eq.' + questId, { method: 'PATCH', body: JSON.stringify({ status: 'completed' }) });
+
+  const players = await api('players?id=eq.' + playerId + '&select=*');
+  const p = players[0];
+  let newXp = p.xp + xpReward;
+  let newLevel = p.level;
+  if (newXp >= p.xp_to_next) { newXp -= p.xp_to_next; newLevel++; }
+  await api('players?id=eq.' + playerId, { method: 'PATCH', body: JSON.stringify({ xp: newXp, level: newLevel, xp_to_next: newLevel * 100 }) });
+
+  const popup = document.getElementById('popup');
+  popup.textContent = '+' + xpReward + ' XP';
+  popup.classList.add('show');
+  setTimeout(() => popup.classList.remove('show'), 1500);
+}
+
+load();
+</script>
+</body>
+</html>
