@@ -150,11 +150,12 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
 .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
 .chart-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-weight: 600; }
-.donut-wrap { position: relative; width: 80px; height: 80px; margin: 0 auto 10px; }
-.legend { display: flex; flex-direction: column; gap: 5px; }
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-dim); }
+.donut-wrap { position: relative; width: 90px; height: 90px; margin: 0 auto 10px; }
+.donut-legend-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-dim); }
 .legend-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.legend-val { margin-left: auto; color: var(--text); font-weight: 600; }
+.legend-val { color: var(--text); font-weight: 600; margin-left: 2px; }
 
 /* Modal / Sheet */
 .modal-overlay {
@@ -321,13 +322,13 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
 
       <div class="charts-row">
         <div class="chart-card">
+          <div class="chart-label">XP за неделю</div>
+          <canvas id="barchart" height="130"></canvas>
+        </div>
+        <div class="chart-card">
           <div class="chart-label">По проектам</div>
           <div class="donut-wrap"><canvas id="donut"></canvas></div>
           <div class="legend" id="donut-legend"></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-label">XP за неделю</div>
-          <canvas id="barchart" height="130"></canvas>
         </div>
       </div>
     </div>
