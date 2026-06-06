@@ -705,38 +705,80 @@ async function onDrop(e) {
 // ── Touch Drag ────────────────────────────────────────────────────────────────
 function addTouchDrag(card) {
   let startX, startY, clone, originalId;
+  let isDragging = false;
+  let longPressTimer = null;
+  let scrollInterval = null;
+  let lastTouchX = 0, lastTouchY = 0;
+
+  function startScroll() {
+    const kanban = document.getElementById('kanban-scroll');
+    const edgeSize = 80;
+    scrollInterval = setInterval(() => {
+      const rect = kanban.getBoundingClientRect();
+      if (lastTouchX > rect.right - edgeSize) {
+        kanban.scrollLeft += 12;
+      } else if (lastTouchX < rect.left + edgeSize) {
+        kanban.scrollLeft -= 12;
+      }
+    }, 30);
+  }
+
+  function stopScroll() {
+    if (scrollInterval) { clearInterval(scrollInterval); scrollInterval = null; }
+  }
+
+  function cancelDrag() {
+    isDragging = false;
+    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    stopScroll();
+    card.classList.remove('dragging');
+    card.style.transform = '';
+    if (clone) { clone.remove(); clone = null; }
+    document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over'));
+  }
+
   card.addEventListener('touchstart', e => {
     if (e.touches.length !== 1) return;
     originalId = parseInt(card.dataset.id);
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
+    lastTouchX = startX;
+    lastTouchY = startY;
+
+    // Longpress 300ms before drag starts
+    longPressTimer = setTimeout(() => {
+      isDragging = true;
+      clone = card.cloneNode(true);
+      clone.style.cssText = `position:fixed;width:${card.offsetWidth}px;opacity:0.85;z-index:999;pointer-events:none;transform:rotate(2deg) scale(1.03);box-shadow:0 8px 24px rgba(0,0,0,0.4);transition:none;`;
+      clone.style.left = (startX - card.offsetWidth/2) + 'px';
+      clone.style.top = (startY - 30) + 'px';
+      document.body.appendChild(clone);
+      card.classList.add('dragging');
+      startScroll();
+      // Haptic feedback if available
+      window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('medium');
+    }, 300);
   }, { passive: true });
 
   card.addEventListener('touchmove', e => {
-    const dx = Math.abs(e.touches[0].clientX - startX);
-    const dy = Math.abs(e.touches[0].clientY - startY);
-    if (dx < 8 && dy < 8) return;
-    e.preventDefault();
-    if (!clone) {
-      clone = card.cloneNode(true);
-      clone.style.cssText = `position:fixed;width:${card.offsetWidth}px;opacity:0.8;z-index:999;pointer-events:none;transform:rotate(2deg);`;
-      document.body.appendChild(clone);
-      card.classList.add('dragging');
-    }
     const touchX = e.touches[0].clientX;
     const touchY = e.touches[0].clientY;
+    lastTouchX = touchX;
+    lastTouchY = touchY;
+
+    // Cancel longpress if moved too much before 300ms
+    if (!isDragging) {
+      const dx = Math.abs(touchX - startX);
+      const dy = Math.abs(touchY - startY);
+      if (dx > 10 || dy > 10) {
+        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+      }
+      return;
+    }
+
+    e.preventDefault();
     clone.style.left = (touchX - card.offsetWidth/2) + 'px';
     clone.style.top = (touchY - 30) + 'px';
-
-    // Auto-scroll kanban horizontally when near edges
-    const kanban = document.getElementById('kanban-scroll');
-    const edgeSize = 80;
-    const rect = kanban.getBoundingClientRect();
-    if (touchX > rect.right - edgeSize) {
-      kanban.scrollLeft += 15;
-    } else if (touchX < rect.left + edgeSize) {
-      kanban.scrollLeft -= 15;
-    }
 
     // Highlight target column
     document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over'));
@@ -746,17 +788,23 @@ function addTouchDrag(card) {
   }, { passive: false });
 
   card.addEventListener('touchend', async e => {
-    card.classList.remove('dragging');
-    document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over'));
-    if (clone) {
+    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    stopScroll();
+
+    if (isDragging) {
+      isDragging = false;
+      card.classList.remove('dragging');
+      document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over'));
       const el = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
       const col = el?.closest('.kanban-cards');
       if (col && col.dataset.status) {
         await updateQuestStatus(originalId, col.dataset.status);
       }
-      clone.remove(); clone = null;
+      if (clone) { clone.remove(); clone = null; }
     }
   });
+
+  card.addEventListener('touchcancel', () => cancelDrag());
 }
 
 async function updateQuestStatus(questId, newStatus) {
