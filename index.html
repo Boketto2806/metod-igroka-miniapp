@@ -2,250 +2,908 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Метод Игрока</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #0f0f13; color: #e8e8f0; font-family: -apple-system, sans-serif; }
-.header { background: #16161e; padding: 16px; border-bottom: 1px solid #2a2a3a; display: flex; align-items: center; gap: 12px; }
-.avatar { width: 44px; height: 44px; border-radius: 50%; background: #534AB7; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; color: #CECBF6; }
-.username { font-size: 15px; font-weight: 600; }
-.level { font-size: 12px; color: #9b8fd4; margin-top: 2px; }
-.streak { background: #1e1a2e; border: 1px solid #534AB7; border-radius: 20px; padding: 6px 12px; font-size: 13px; color: #AFA9EC; margin-left: auto; }
-.content { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
-.block { background: #16161e; border-radius: 12px; padding: 14px; border: 1px solid #2a2a3a; }
-.xp-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: #6b6b80; }
-.xp-val { color: #AFA9EC; font-weight: 500; }
-.bar-bg { background: #1e1e2e; border-radius: 6px; height: 10px; }
-.bar-fill { background: #534AB7; border-radius: 6px; height: 100%; transition: width 1s; }
-.xp-levels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: #6b6b80; }
-.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.stat { background: #16161e; border-radius: 8px; padding: 12px; border: 1px solid #2a2a3a; }
-.stat-num { font-size: 22px; font-weight: 600; }
-.stat-lbl { font-size: 12px; color: #6b6b80; margin-top: 2px; }
-.purple { color: #AFA9EC; }
-.green { color: #5DCAA5; }
-.amber { color: #EF9F27; }
-.section-title { font-size: 11px; color: #6b6b80; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-.charts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.chart-block { background: #16161e; border-radius: 12px; padding: 14px; border: 1px solid #2a2a3a; }
-.chart-title { font-size: 11px; color: #6b6b80; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
-.donut-wrap { position: relative; width: 90px; height: 90px; margin: 0 auto; }
-.legend { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #9b9bae; }
-.dot { width: 8px; height: 8px; border-radius: 50%; }
-.legend-val { margin-left: auto; font-weight: 500; color: #c8c8d8; }
-.quest { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #1e1e2e; cursor: pointer; }
-.quest:last-child { border-bottom: none; padding-bottom: 0; }
-.quest:first-child { padding-top: 0; }
-.cb { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid #3a3a50; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: all 0.2s; }
-.cb.done { background: #534AB7; border-color: #534AB7; }
-.qt { font-size: 14px; color: #c8c8d8; line-height: 1.4; }
-.qt.done { text-decoration: line-through; color: #6b6b80; }
-.qmeta { display: flex; gap: 8px; margin-top: 4px; }
-.proj { font-size: 11px; color: #534AB7; background: #1e1a2e; padding: 2px 8px; border-radius: 10px; }
-.xpbadge { font-size: 11px; color: #9b8fd4; }
-.tabs { display: flex; background: #16161e; border-top: 1px solid #2a2a3a; position: sticky; bottom: 0; }
-.tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; color: #6b6b80; cursor: pointer; border-top: 2px solid transparent; }
-.tab.active { color: #AFA9EC; border-top-color: #534AB7; }
-.hidden { display: none; }
-.xp-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0); background: #534AB7; color: #fff; padding: 12px 24px; border-radius: 12px; font-size: 16px; font-weight: 600; transition: all 0.3s; z-index: 100; }
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1a1a24;
+  --border: #252535;
+  --accent: #6c5ce7;
+  --accent-soft: #2d2750;
+  --accent-text: #b8b0ff;
+  --green: #00cfa8;
+  --green-soft: #003d32;
+  --amber: #f0a500;
+  --amber-soft: #3d2800;
+  --red: #ff5f5f;
+  --text: #e0e0f0;
+  --text-muted: #5a5a7a;
+  --text-dim: #8888aa;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; }
+body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; display: flex; flex-direction: column; }
+
+/* Scrollable pages */
+.app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+.page { flex: 1; overflow-y: auto; overflow-x: hidden; display: none; }
+.page.active { display: block; }
+.page-content { padding: 12px 14px 80px; display: flex; flex-direction: column; gap: 12px; }
+
+/* Header */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 14px;
+  flex-shrink: 0;
+}
+.header-top { display: flex; align-items: center; gap: 10px; }
+.avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #a855f7);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.header-info { flex: 1; min-width: 0; }
+.header-name { font-size: 15px; font-weight: 600; color: var(--text); }
+.header-level { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+.streak-badge {
+  background: var(--amber-soft); border: 1px solid var(--amber);
+  border-radius: 20px; padding: 5px 10px;
+  font-size: 12px; color: var(--amber); font-weight: 600; flex-shrink: 0;
+}
+.xp-bar-wrap { margin-top: 10px; }
+.xp-bar-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; }
+.xp-bar-labels span:last-child { color: var(--accent-text); }
+.xp-track { background: var(--surface2); border-radius: 4px; height: 6px; }
+.xp-fill { background: linear-gradient(90deg, var(--accent), #a855f7); border-radius: 4px; height: 100%; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+
+/* Cards */
+.card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
+.card-header { padding: 12px 14px 0; display: flex; align-items: center; justify-content: space-between; }
+.card-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; }
+.card-body { padding: 12px 14px; }
+
+/* Add quest button */
+.add-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--accent-soft); border: 1px dashed var(--accent);
+  border-radius: var(--radius-sm); padding: 11px 14px;
+  color: var(--accent-text); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s; width: 100%;
+}
+.add-btn:active { opacity: 0.7; transform: scale(0.98); }
+.add-btn-icon { width: 20px; height: 20px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; flex-shrink: 0; }
+
+/* Quest items */
+.quest-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 11px 0; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: opacity 0.15s;
+}
+.quest-item:last-child { border-bottom: none; padding-bottom: 0; }
+.quest-item:first-child { padding-top: 0; }
+.quest-item:active { opacity: 0.6; }
+.quest-cb {
+  width: 20px; height: 20px; border-radius: 6px;
+  border: 1.5px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 2px; transition: all 0.2s; font-size: 11px;
+}
+.quest-cb.done { background: var(--accent); border-color: var(--accent); color: #fff; }
+.quest-body { flex: 1; min-width: 0; }
+.quest-title { font-size: 14px; color: var(--text); line-height: 1.4; }
+.quest-title.done { text-decoration: line-through; color: var(--text-muted); }
+.quest-meta { display: flex; align-items: center; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
+.quest-proj { font-size: 11px; color: var(--accent-text); background: var(--accent-soft); padding: 2px 8px; border-radius: 10px; }
+.quest-xp { font-size: 11px; color: var(--text-muted); }
+.quest-deadline { font-size: 11px; color: var(--amber); display: flex; align-items: center; gap: 3px; }
+.quest-deadline.overdue { color: var(--red); }
+
+/* Stats grid */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; }
+.stat-val { font-size: 24px; font-weight: 700; line-height: 1; }
+.stat-lbl { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.purple { color: var(--accent-text); }
+.green { color: var(--green); }
+.amber { color: var(--amber); }
+
+/* Calendar */
+.cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.cal-nav-btn { width: 30px; height: 30px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.cal-nav-btn:active { opacity: 0.6; }
+.cal-month { font-size: 14px; font-weight: 600; color: var(--text); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-dow { text-align: center; font-size: 10px; color: var(--text-muted); font-weight: 600; padding: 4px 0; text-transform: uppercase; }
+.cal-day {
+  aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; cursor: pointer;
+  font-size: 12px; color: var(--text-dim); position: relative;
+  transition: all 0.15s; padding: 2px;
+}
+.cal-day:active { opacity: 0.6; }
+.cal-day.other-month { color: var(--text-muted); opacity: 0.3; }
+.cal-day.today { background: var(--accent-soft); color: var(--accent-text); font-weight: 700; border: 1px solid var(--accent); }
+.cal-day.selected { background: var(--accent); color: #fff; font-weight: 700; }
+.cal-day.has-quests::after {
+  content: ''; position: absolute; bottom: 3px;
+  width: 4px; height: 4px; border-radius: 50%; background: var(--green);
+}
+.cal-day.today.has-quests::after, .cal-day.selected.has-quests::after { background: #fff; }
+.cal-day-num { line-height: 1; }
+.cal-selected-quests { margin-top: 12px; }
+.cal-selected-title { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
+.cal-quest-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--surface2); border-radius: var(--radius-sm); margin-bottom: 6px; border-left: 3px solid var(--accent); }
+.cal-quest-item.done-item { border-left-color: var(--green); opacity: 0.6; }
+.cal-quest-name { font-size: 13px; color: var(--text); flex: 1; }
+.cal-quest-xp { font-size: 11px; color: var(--accent-text); }
+.cal-quest-time { font-size: 11px; color: var(--text-muted); }
+
+/* Charts */
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
+.chart-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-weight: 600; }
+.donut-wrap { position: relative; width: 80px; height: 80px; margin: 0 auto 10px; }
+.legend { display: flex; flex-direction: column; gap: 5px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-dim); }
+.legend-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.legend-val { margin-left: auto; color: var(--text); font-weight: 600; }
+
+/* Modal / Sheet */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  display: flex; align-items: flex-end; z-index: 100;
+  opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-sheet {
+  width: 100%; background: var(--surface);
+  border-radius: 20px 20px 0 0; padding: 0 0 env(safe-area-inset-bottom);
+  transform: translateY(100%); transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+  max-height: 90vh; overflow-y: auto;
+}
+.modal-overlay.open .modal-sheet { transform: translateY(0); }
+.modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 16px; }
+.modal-title { font-size: 17px; font-weight: 700; color: var(--text); padding: 0 16px 16px; }
+.form-group { padding: 0 16px 14px; }
+.form-label { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 7px; display: block; }
+.form-input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 11px 12px;
+  color: var(--text); font-size: 14px; outline: none;
+  transition: border-color 0.15s; font-family: inherit;
+}
+.form-input:focus { border-color: var(--accent); }
+.form-input::placeholder { color: var(--text-muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.chip {
+  padding: 7px 14px; border-radius: 20px;
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text-dim); font-size: 13px; cursor: pointer;
+  transition: all 0.15s; font-family: inherit;
+}
+.chip.selected { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
+.chip:active { opacity: 0.7; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.submit-btn {
+  width: calc(100% - 32px); margin: 4px 16px 16px;
+  background: var(--accent); border: none; border-radius: var(--radius-sm);
+  padding: 14px; color: #fff; font-size: 15px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: opacity 0.15s;
+}
+.submit-btn:active { opacity: 0.8; }
+
+/* Bottom tabs */
+.tabs {
+  display: flex; background: var(--surface);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom);
+}
+.tab { flex: 1; padding: 10px 4px; text-align: center; cursor: pointer; transition: color 0.15s; }
+.tab-icon { font-size: 18px; line-height: 1; }
+.tab-label { font-size: 10px; color: var(--text-muted); margin-top: 3px; font-weight: 500; }
+.tab.active .tab-label { color: var(--accent-text); }
+.tab.active .tab-icon { filter: drop-shadow(0 0 4px var(--accent)); }
+
+/* XP popup */
+.xp-popup {
+  position: fixed; top: 30%; left: 50%; transform: translate(-50%,-50%) scale(0);
+  background: var(--accent); color: #fff; padding: 12px 28px;
+  border-radius: 12px; font-size: 18px; font-weight: 700;
+  transition: all 0.25s cubic-bezier(.4,0,.2,1); z-index: 200;
+  pointer-events: none;
+}
 .xp-popup.show { transform: translate(-50%,-50%) scale(1); }
+
+/* Empty state */
+.empty { text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 13px; }
+.empty-icon { font-size: 28px; margin-bottom: 8px; }
+
+/* History item */
+.history-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+.history-item:last-child { border-bottom: none; }
+.history-check { width: 20px; height: 20px; border-radius: 6px; background: var(--green-soft); border: 1px solid var(--green); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--green); flex-shrink: 0; margin-top: 2px; }
+.history-body { flex: 1; }
+.history-title { font-size: 14px; color: var(--text-dim); text-decoration: line-through; }
+.history-meta { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+
+/* Achievement */
+.achieve-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.achieve-item:last-child { border-bottom: none; }
+.achieve-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--amber-soft); border: 1px solid var(--amber); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.achieve-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.achieve-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* Divider */
+.divider { height: 1px; background: var(--border); }
 </style>
 </head>
 <body>
-<div class="header">
-  <div class="avatar" id="av">РА</div>
-  <div>
-    <div class="username" id="uname">Загрузка...</div>
-    <div class="level" id="ulevel">Уровень 1</div>
-  </div>
-  <div class="streak" id="streak">🔥 0 дней</div>
-</div>
 
-<div id="page-today">
-<div class="content">
-  <div class="block">
-    <div class="xp-header"><span>Прогресс до следующего уровня</span><span class="xp-val" id="xpval">0 / 100 XP</span></div>
-    <div class="bar-bg"><div class="bar-fill" id="xpbar" style="width:0%"></div></div>
-    <div class="xp-levels"><span id="lvl-cur">Ур. 1</span><span id="xp-pct">0%</span><span id="lvl-next">Ур. 2</span></div>
-  </div>
-
-  <div class="stats">
-    <div class="stat"><div class="stat-num purple" id="total-xp">0</div><div class="stat-lbl">Всего XP</div></div>
-    <div class="stat"><div class="stat-num green" id="total-q">0</div><div class="stat-lbl">Квестов закрыто</div></div>
-    <div class="stat"><div class="stat-num amber" id="cur-streak">0</div><div class="stat-lbl">Текущий streak</div></div>
-    <div class="stat"><div class="stat-num" id="best-streak">0</div><div class="stat-lbl">Лучший streak</div></div>
+<div class="app">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div class="avatar" id="av">И</div>
+      <div class="header-info">
+        <div class="header-name" id="uname">Загрузка...</div>
+        <div class="header-level" id="ulevel">Уровень 1</div>
+      </div>
+      <div class="streak-badge" id="streak">🔥 0 дней</div>
+    </div>
+    <div class="xp-bar-wrap">
+      <div class="xp-bar-labels">
+        <span id="lvl-cur">Ур. 1</span>
+        <span id="xpval">0 / 100 XP</span>
+        <span id="lvl-next">Ур. 2</span>
+      </div>
+      <div class="xp-track"><div class="xp-fill" id="xpbar" style="width:0%"></div></div>
+    </div>
   </div>
 
-  <div class="charts">
-    <div class="chart-block">
-      <div class="chart-title">По проектам</div>
-      <div class="donut-wrap"><canvas id="donut"></canvas></div>
-      <div class="legend">
-        <div class="legend-item"><div class="dot" style="background:#534AB7"></div>Метод Игрока<span class="legend-val" id="l1">0</span></div>
-        <div class="legend-item"><div class="dot" style="background:#1D9E75"></div>AI OFM<span class="legend-val" id="l2">0</span></div>
-        <div class="legend-item"><div class="dot" style="background:#EF9F27"></div>Другое<span class="legend-val" id="l3">0</span></div>
+  <!-- PAGE: TODAY -->
+  <div class="page active" id="page-today">
+    <div class="page-content">
+
+      <!-- Add quest button -->
+      <button class="add-btn" onclick="openAddModal()">
+        <div class="add-btn-icon">+</div>
+        Добавить квест
+      </button>
+
+      <!-- Active quests -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Активные квесты</span>
+          <span id="active-count" style="font-size:12px;color:var(--text-muted)">0</span>
+        </div>
+        <div class="card-body" id="quest-list">
+          <div class="empty"><div class="empty-icon">⚔️</div>Квестов пока нет</div>
+        </div>
+      </div>
+
+      <!-- Calendar -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Календарь</span>
+        </div>
+        <div class="card-body">
+          <div class="cal-nav">
+            <button class="cal-nav-btn" onclick="calPrev()">‹</button>
+            <span class="cal-month" id="cal-month-title"></span>
+            <button class="cal-nav-btn" onclick="calNext()">›</button>
+          </div>
+          <div class="cal-grid" id="cal-dow"></div>
+          <div class="cal-grid" id="cal-days"></div>
+          <div class="cal-selected-quests" id="cal-quests"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PAGE: STATS -->
+  <div class="page" id="page-stats">
+    <div class="page-content">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-val purple" id="s-xp">0</div><div class="stat-lbl">Всего XP</div></div>
+        <div class="stat-card"><div class="stat-val green" id="s-quests">0</div><div class="stat-lbl">Квестов закрыто</div></div>
+        <div class="stat-card"><div class="stat-val amber" id="s-streak">0</div><div class="stat-lbl">Текущий streak</div></div>
+        <div class="stat-card"><div class="stat-val" id="s-best">0</div><div class="stat-lbl">Лучший streak</div></div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-label">По проектам</div>
+          <div class="donut-wrap"><canvas id="donut"></canvas></div>
+          <div class="legend" id="donut-legend"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-label">XP за неделю</div>
+          <canvas id="barchart" height="130"></canvas>
+        </div>
       </div>
     </div>
-    <div class="chart-block">
-      <div class="chart-title">XP за неделю</div>
-      <canvas id="barchart" height="140"></canvas>
+  </div>
+
+  <!-- PAGE: HISTORY -->
+  <div class="page" id="page-history">
+    <div class="page-content">
+      <div class="card">
+        <div class="card-header"><span class="card-title">История</span></div>
+        <div class="card-body" id="history-list">
+          <div class="empty"><div class="empty-icon">📜</div>История пуста</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="block">
-    <div class="section-title">Квесты на сегодня</div>
-    <div id="quest-list"><div style="color:#6b6b80;font-size:14px">Квестов пока нет</div></div>
+  <!-- PAGE: ACHIEVEMENTS -->
+  <div class="page" id="page-achieve">
+    <div class="page-content">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Достижения</span></div>
+        <div class="card-body" id="achieve-list">
+          <div class="empty"><div class="empty-icon">🏆</div>Достижений пока нет</div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-</div>
 
-<div id="page-history" class="hidden">
-  <div class="content">
-    <div class="block">
-      <div class="section-title">История квестов</div>
-      <div id="history-list"><div style="color:#6b6b80;font-size:14px">История пуста</div></div>
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('today',this)" id="tab-today">
+      <div class="tab-icon">⚔️</div>
+      <div class="tab-label">Квесты</div>
+    </div>
+    <div class="tab" onclick="showTab('stats',this)" id="tab-stats">
+      <div class="tab-icon">📊</div>
+      <div class="tab-label">Статистика</div>
+    </div>
+    <div class="tab" onclick="showTab('history',this)" id="tab-history">
+      <div class="tab-icon">📜</div>
+      <div class="tab-label">История</div>
+    </div>
+    <div class="tab" onclick="showTab('achieve',this)" id="tab-achieve">
+      <div class="tab-icon">🏆</div>
+      <div class="tab-label">Ачивки</div>
     </div>
   </div>
 </div>
 
-<div id="page-achieve" class="hidden">
-  <div class="content">
-    <div class="block">
-      <div class="section-title">Достижения</div>
-      <div id="achieve-list"><div style="color:#6b6b80;font-size:14px">Достижений пока нет</div></div>
+<!-- ADD QUEST MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModalIfOutside(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Новый квест</div>
+
+    <div class="form-group">
+      <label class="form-label">Название</label>
+      <input class="form-input" id="f-title" type="text" placeholder="Что нужно сделать?">
     </div>
+
+    <div class="form-group">
+      <label class="form-label">Проект</label>
+      <div class="chips" id="f-projects"></div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Награда XP</label>
+      <div class="chips">
+        <button class="chip" onclick="selectXP(this,50)">50 XP</button>
+        <button class="chip" onclick="selectXP(this,100)">100 XP</button>
+        <button class="chip" onclick="selectXP(this,150)">150 XP</button>
+        <button class="chip" onclick="selectXP(this,200)">200 XP</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Дедлайн (необязательно)</label>
+      <div class="form-row">
+        <input class="form-input" id="f-date" type="date">
+        <input class="form-input" id="f-time" type="time">
+      </div>
+    </div>
+
+    <button class="submit-btn" onclick="submitQuest()">Добавить квест</button>
   </div>
 </div>
 
-<div class="tabs">
-  <div class="tab active" onclick="showTab('today',this)">Сегодня</div>
-  <div class="tab" onclick="showTab('history',this)">История</div>
-  <div class="tab" onclick="showTab('achieve',this)">Ачивки</div>
-</div>
-
+<!-- XP POPUP -->
 <div class="xp-popup" id="popup"></div>
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
 const SUPABASE_URL = 'https://bvtymkmohytadgjlrjyt.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ2dHlta21vaHl0YWRnamxyanl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTY5NTYsImV4cCI6MjA5NTk3Mjk1Nn0.G-WpAfExuJHIv0eNKTcLUNtu8w7TeUMHKRN55HiXu90';
 
-function showTab(name, el) {
-  document.querySelectorAll('[id^="page-"]').forEach(p => p.classList.add('hidden'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + name).classList.remove('hidden');
-  el.classList.add('active');
-}
+let PLAYER = null;
+let ALL_QUESTS = [];
+let PROJECTS = [];
+let calYear, calMonth, selectedDay = null;
+let selectedXP = 100;
+let selectedProject = null;
+let donutChart = null, barChart = null;
 
-async function api(path, opts={}) {
-  const r = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', ...opts.headers },
+// ── API ──────────────────────────────────────────────────────────────────────
+
+async function api(path, opts = {}) {
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...opts.headers
+    },
     ...opts
   });
-  return r.json();
+  if (res.status === 204) return null;
+  return res.json();
 }
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+
+function showTab(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  el.classList.add('active');
+  if (name === 'stats') renderStats();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
 
 async function load() {
   const tg = window.Telegram?.WebApp;
+  tg?.expand();
+  tg?.setHeaderColor('#13131a');
+
   const userId = tg?.initDataUnsafe?.user?.id || 1912211200;
   const firstName = tg?.initDataUnsafe?.user?.first_name || 'Игрок';
 
   document.getElementById('av').textContent = firstName[0].toUpperCase();
   document.getElementById('uname').textContent = firstName;
-  tg?.expand();
 
   const players = await api('players?telegram_id=eq.' + userId + '&select=*');
-  if (!players.length) return;
-  const p = players[0];
+  if (!players || !players.length) return;
+  PLAYER = players[0];
 
-  document.getElementById('ulevel').textContent = 'Уровень ' + p.level;
-  document.getElementById('streak').textContent = '🔥 ' + p.streak + ' дней';
-  document.getElementById('xpval').textContent = p.xp + ' / ' + p.xp_to_next + ' XP';
-  const pct = Math.round(p.xp / p.xp_to_next * 100);
-  document.getElementById('xpbar').style.width = pct + '%';
-  document.getElementById('xp-pct').textContent = pct + '%';
-  document.getElementById('lvl-cur').textContent = 'Ур. ' + p.level;
-  document.getElementById('lvl-next').textContent = 'Ур. ' + (p.level + 1);
-  document.getElementById('total-xp').textContent = (p.xp + (p.level - 1) * 100).toLocaleString();
-  document.getElementById('cur-streak').textContent = p.streak;
-  document.getElementById('best-streak').textContent = p.best_streak;
+  renderHeader();
 
-  const quests = await api('quests?player_id=eq.' + p.id + '&select=*&order=created_at.desc');
-  const active = quests.filter(q => q.status === 'active');
-  const done = quests.filter(q => q.status === 'completed');
+  ALL_QUESTS = await api('quests?player_id=eq.' + PLAYER.id + '&select=*&order=created_at.desc') || [];
+  PROJECTS = await api('projects?player_id=eq.' + PLAYER.id + '&select=*') || [];
 
-  document.getElementById('total-q').textContent = done.length;
-
-  const ql = document.getElementById('quest-list');
-  if (active.length) {
-    ql.innerHTML = active.map(q => `
-      <div class="quest" onclick="completeQuest(${q.id}, ${q.xp_reward}, ${p.id}, this)">
-        <div class="cb"></div>
-        <div style="flex:1">
-          <div class="qt">${q.title}</div>
-          <div class="qmeta"><span class="proj">${q.project || 'Общее'}</span><span class="xpbadge">+${q.xp_reward} XP</span></div>
-        </div>
-      </div>`).join('');
-  }
-
-  const hl = document.getElementById('history-list');
-  if (done.length) {
-    hl.innerHTML = done.map(q => `
-      <div class="quest">
-        <div class="cb done">✓</div>
-        <div style="flex:1">
-          <div class="qt done">${q.title}</div>
-          <div class="qmeta"><span class="proj">${q.project || 'Общее'}</span><span class="xpbadge">+${q.xp_reward} XP</span></div>
-        </div>
-      </div>`).join('');
-  }
-
-  const mi = quests.filter(q => q.project === 'Метод Игрока').length;
-  const ofm = quests.filter(q => q.project === 'AI OFM').length;
-  const other = quests.length - mi - ofm;
-  document.getElementById('l1').textContent = mi;
-  document.getElementById('l2').textContent = ofm;
-  document.getElementById('l3').textContent = other;
-
-  new Chart(document.getElementById('donut'), {
-    type: 'doughnut',
-    data: { datasets: [{ data: [mi||1, ofm||1, other||1], backgroundColor: ['#534AB7','#1D9E75','#EF9F27'], borderWidth: 0 }] },
-    options: { cutout: '72%', plugins: { legend: { display: false }, tooltip: { enabled: false } } }
-  });
-
-  new Chart(document.getElementById('barchart'), {
-    type: 'bar',
-    data: {
-      labels: ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'],
-      datasets: [{ data: [120,180,90,200,150,70,40], backgroundColor: '#534AB7', borderRadius: 4 }]
-    },
-    options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#6b6b80', font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: '#6b6b80', font: { size: 10 } }, grid: { color: '#1e1e2e' } } } }
-  });
+  renderQuests();
+  renderHistory();
+  renderAchievements();
+  initCalendar();
 }
 
-async function completeQuest(questId, xpReward, playerId, el) {
-  el.querySelector('.cb').classList.add('done');
-  el.querySelector('.cb').textContent = '✓';
-  el.querySelector('.qt').classList.add('done');
+// ── Header ────────────────────────────────────────────────────────────────────
 
-  await api('quests?id=eq.' + questId, { method: 'PATCH', body: JSON.stringify({ status: 'completed' }) });
+function renderHeader() {
+  document.getElementById('ulevel').textContent = 'Уровень ' + PLAYER.level;
+  document.getElementById('streak').textContent = '🔥 ' + PLAYER.streak + ' дней';
+  document.getElementById('xpval').textContent = PLAYER.xp + ' / ' + PLAYER.xp_to_next + ' XP';
+  const pct = Math.round(PLAYER.xp / PLAYER.xp_to_next * 100);
+  document.getElementById('xpbar').style.width = pct + '%';
+  document.getElementById('lvl-cur').textContent = 'Ур. ' + PLAYER.level;
+  document.getElementById('lvl-next').textContent = 'Ур. ' + (PLAYER.level + 1);
+}
 
-  const players = await api('players?id=eq.' + playerId + '&select=*');
-  const p = players[0];
-  let newXp = p.xp + xpReward;
-  let newLevel = p.level;
-  if (newXp >= p.xp_to_next) { newXp -= p.xp_to_next; newLevel++; }
-  await api('players?id=eq.' + playerId, { method: 'PATCH', body: JSON.stringify({ xp: newXp, level: newLevel, xp_to_next: newLevel * 100 }) });
+// ── Quests ────────────────────────────────────────────────────────────────────
+
+function renderQuests() {
+  const active = ALL_QUESTS.filter(q => q.status === 'active');
+  document.getElementById('active-count').textContent = active.length;
+  const el = document.getElementById('quest-list');
+  if (!active.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">⚔️</div>Квестов пока нет</div>';
+    return;
+  }
+  el.innerHTML = active.map(q => {
+    const dl = formatDeadline(q.deadline);
+    const overdue = q.deadline && new Date(q.deadline) < new Date();
+    return `<div class="quest-item" onclick="completeQuest(${q.id}, ${q.xp_reward}, this)">
+      <div class="quest-cb"></div>
+      <div class="quest-body">
+        <div class="quest-title">${q.title}</div>
+        <div class="quest-meta">
+          <span class="quest-proj">${q.project || 'Общее'}</span>
+          <span class="quest-xp">+${q.xp_reward} XP</span>
+          ${dl ? `<span class="quest-deadline${overdue?' overdue':''}">📅 ${dl}</span>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function formatDeadline(dl) {
+  if (!dl) return '';
+  const d = new Date(dl);
+  const now = new Date();
+  const isToday = d.toDateString() === now.toDateString();
+  const tomorrow = new Date(now); tomorrow.setDate(now.getDate()+1);
+  const isTomorrow = d.toDateString() === tomorrow.toDateString();
+  const time = d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+  if (isToday) return 'сегодня ' + time;
+  if (isTomorrow) return 'завтра ' + time;
+  return d.toLocaleDateString('ru',{day:'numeric',month:'short'}) + ' ' + time;
+}
+
+// ── Complete Quest ─────────────────────────────────────────────────────────────
+
+async function completeQuest(questId, xpReward, el) {
+  el.querySelector('.quest-cb').classList.add('done');
+  el.querySelector('.quest-cb').textContent = '✓';
+  el.querySelector('.quest-title').classList.add('done');
+  el.style.pointerEvents = 'none';
+
+  await api('quests?id=eq.' + questId, {
+    method: 'PATCH',
+    body: JSON.stringify({ status: 'completed', completed_at: new Date().toISOString() })
+  });
+
+  let newXp = PLAYER.xp + xpReward;
+  let newLevel = PLAYER.level;
+  let leveled = false;
+  if (newXp >= PLAYER.xp_to_next) { newXp -= PLAYER.xp_to_next; newLevel++; leveled = true; }
+
+  await api('players?id=eq.' + PLAYER.id, {
+    method: 'PATCH',
+    body: JSON.stringify({ xp: newXp, level: newLevel, xp_to_next: newLevel * 100, last_active: new Date().toISOString() })
+  });
+
+  PLAYER.xp = newXp; PLAYER.level = newLevel; PLAYER.xp_to_next = newLevel * 100;
+  renderHeader();
+
+  const q = ALL_QUESTS.find(q => q.id === questId);
+  if (q) q.status = 'completed';
 
   const popup = document.getElementById('popup');
-  popup.textContent = '+' + xpReward + ' XP';
+  popup.textContent = leveled ? `🎉 УРОВЕНЬ ${newLevel}!` : `+${xpReward} XP`;
   popup.classList.add('show');
-  setTimeout(() => popup.classList.remove('show'), 1500);
+  setTimeout(() => popup.classList.remove('show'), 1800);
+
+  setTimeout(() => { renderQuests(); renderHistory(); renderCalendarDays(); }, 400);
 }
 
+// ── History ───────────────────────────────────────────────────────────────────
+
+function renderHistory() {
+  const done = ALL_QUESTS.filter(q => q.status === 'completed');
+  const el = document.getElementById('history-list');
+  if (!done.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📜</div>История пуста</div>';
+    return;
+  }
+  el.innerHTML = done.map(q => `
+    <div class="history-item">
+      <div class="history-check">✓</div>
+      <div class="history-body">
+        <div class="history-title">${q.title}</div>
+        <div class="history-meta">
+          <span class="quest-proj">${q.project || 'Общее'}</span>
+          <span class="quest-xp">+${q.xp_reward} XP</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Achievements ──────────────────────────────────────────────────────────────
+
+async function renderAchievements() {
+  const data = await api('achievements?player_id=eq.' + PLAYER.id + '&select=*') || [];
+  const el = document.getElementById('achieve-list');
+  if (!data.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🏆</div>Достижений пока нет</div>';
+    return;
+  }
+  const icons = { 'Первый шаг': '👣', 'Десятка': '🔟', 'Полсотни': '💫', 'Неделя побед': '🔥', 'Месяц силы': '⚡', 'Опытный игрок': '🎖️' };
+  el.innerHTML = data.map(a => `
+    <div class="achieve-item">
+      <div class="achieve-icon">${icons[a.title] || '🏆'}</div>
+      <div>
+        <div class="achieve-title">${a.title}</div>
+        <div class="achieve-desc">${a.description}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
+
+function renderStats() {
+  const done = ALL_QUESTS.filter(q => q.status === 'completed');
+  const totalXp = PLAYER.xp + (PLAYER.level - 1) * 100;
+  document.getElementById('s-xp').textContent = totalXp.toLocaleString();
+  document.getElementById('s-quests').textContent = done.length;
+  document.getElementById('s-streak').textContent = PLAYER.streak;
+  document.getElementById('s-best').textContent = PLAYER.best_streak;
+
+  renderDonut();
+  renderBarChart();
+}
+
+function renderDonut() {
+  const projectCounts = {};
+  ALL_QUESTS.forEach(q => {
+    const name = q.project || 'Общее';
+    projectCounts[name] = (projectCounts[name] || 0) + 1;
+  });
+
+  const colors = ['#6c5ce7','#00cfa8','#f0a500','#ff5f5f','#a855f7','#3b82f6'];
+  const labels = Object.keys(projectCounts);
+  const values = Object.values(projectCounts);
+
+  if (donutChart) donutChart.destroy();
+  donutChart = new Chart(document.getElementById('donut'), {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: values.length ? values : [1],
+        backgroundColor: values.length ? labels.map((_,i) => colors[i % colors.length]) : ['#252535'],
+        borderWidth: 0
+      }]
+    },
+    options: { cutout: '70%', plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+  });
+
+  const legend = document.getElementById('donut-legend');
+  legend.innerHTML = labels.map((lbl, i) => `
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${colors[i % colors.length]}"></div>
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70px">${lbl}</span>
+      <span class="legend-val">${values[i]}</span>
+    </div>`).join('');
+}
+
+async function renderBarChart() {
+  // Реальные данные XP за последние 7 дней
+  const days = [];
+  const labels = [];
+  const dayNames = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+  const now = new Date();
+
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    const start = new Date(d); start.setHours(0,0,0,0);
+    const end = new Date(d); end.setHours(23,59,59,999);
+    days.push({ start, end });
+    labels.push(dayNames[d.getDay()]);
+  }
+
+  const xpData = days.map(({ start, end }) => {
+    return ALL_QUESTS
+      .filter(q => q.status === 'completed' && q.completed_at)
+      .filter(q => {
+        const t = new Date(q.completed_at);
+        return t >= start && t <= end;
+      })
+      .reduce((sum, q) => sum + (q.xp_reward || 0), 0);
+  });
+
+  if (barChart) barChart.destroy();
+  barChart = new Chart(document.getElementById('barchart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: xpData,
+        backgroundColor: xpData.map((_, i) => i === 6 ? '#6c5ce7' : '#2d2750'),
+        borderRadius: 4,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false }, tooltip: { enabled: true } },
+      scales: {
+        x: { ticks: { color: '#5a5a7a', font: { size: 10 } }, grid: { display: false } },
+        y: { ticks: { color: '#5a5a7a', font: { size: 10 } }, grid: { color: '#1a1a24' } }
+      }
+    }
+  });
+}
+
+// ── Calendar ──────────────────────────────────────────────────────────────────
+
+function initCalendar() {
+  const now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
+  selectedDay = now.getDate();
+  renderCalendar();
+}
+
+function calPrev() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
+function calNext() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); }
+
+function renderCalendar() {
+  const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  document.getElementById('cal-month-title').textContent = monthNames[calMonth] + ' ' + calYear;
+
+  const dowEl = document.getElementById('cal-dow');
+  const dows = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  dowEl.innerHTML = dows.map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+  renderCalendarDays();
+}
+
+function renderCalendarDays() {
+  const today = new Date();
+  const firstDay = new Date(calYear, calMonth, 1);
+  let startDow = firstDay.getDay(); // 0=Sun
+  startDow = startDow === 0 ? 6 : startDow - 1; // Mon=0
+
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+
+  // Build deadline map: 'YYYY-MM-DD' -> quests[]
+  const deadlineMap = {};
+  ALL_QUESTS.forEach(q => {
+    if (q.deadline) {
+      const d = new Date(q.deadline);
+      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      if (!deadlineMap[key]) deadlineMap[key] = [];
+      deadlineMap[key].push(q);
+    }
+  });
+
+  let html = '';
+  // Prev month days
+  for (let i = startDow - 1; i >= 0; i--) {
+    html += `<div class="cal-day other-month"><span class="cal-day-num">${daysInPrev - i}</span></div>`;
+  }
+  // Current month
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
+    const isSelected = d === selectedDay;
+    const key = `${calYear}-${calMonth}-${d}`;
+    const hasQuests = !!deadlineMap[key];
+    let cls = 'cal-day';
+    if (isSelected) cls += ' selected';
+    else if (isToday) cls += ' today';
+    if (hasQuests) cls += ' has-quests';
+    html += `<div class="${cls}" onclick="selectCalDay(${d})"><span class="cal-day-num">${d}</span></div>`;
+  }
+  // Next month
+  const totalCells = startDow + daysInMonth;
+  const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let i = 1; i <= remaining; i++) {
+    html += `<div class="cal-day other-month"><span class="cal-day-num">${i}</span></div>`;
+  }
+
+  document.getElementById('cal-days').innerHTML = html;
+  renderCalendarQuests(deadlineMap);
+}
+
+function selectCalDay(d) {
+  selectedDay = d;
+  renderCalendarDays();
+}
+
+function renderCalendarQuests(deadlineMap) {
+  const key = `${calYear}-${calMonth}-${selectedDay}`;
+  const quests = deadlineMap[key] || [];
+  const el = document.getElementById('cal-quests');
+
+  if (!selectedDay) { el.innerHTML = ''; return; }
+
+  const dateStr = new Date(calYear, calMonth, selectedDay).toLocaleDateString('ru', { day:'numeric', month:'long' });
+  el.innerHTML = `<div class="cal-selected-title">${dateStr}</div>`;
+
+  if (!quests.length) {
+    el.innerHTML += '<div style="font-size:13px;color:var(--text-muted);padding:4px 0">Нет квестов на этот день</div>';
+    return;
+  }
+
+  el.innerHTML += quests.map(q => {
+    const time = new Date(q.deadline).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="cal-quest-item${q.status==='completed'?' done-item':''}">
+      <div style="flex:1">
+        <div class="cal-quest-name">${q.title}</div>
+        <span class="quest-proj" style="font-size:10px">${q.project||'Общее'}</span>
+      </div>
+      <div style="text-align:right">
+        <div class="cal-quest-xp">+${q.xp_reward} XP</div>
+        <div class="cal-quest-time">${time}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Add Quest Modal ───────────────────────────────────────────────────────────
+
+function openAddModal() {
+  // Populate projects
+  const el = document.getElementById('f-projects');
+  el.innerHTML = PROJECTS.map(p => `<button class="chip" onclick="selectProject(this,'${p.name}')">${p.name}</button>`).join('') +
+    `<button class="chip" onclick="selectProject(this,'Другое')">Другое</button>`;
+
+  // Set default date to today
+  const today = new Date();
+  document.getElementById('f-date').value = today.toISOString().split('T')[0];
+  document.getElementById('f-time').value = '';
+  document.getElementById('f-title').value = '';
+  selectedXP = 100;
+  selectedProject = null;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+
+  document.getElementById('modal').classList.add('open');
+  setTimeout(() => document.getElementById('f-title').focus(), 300);
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+function closeModalIfOutside(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+}
+
+function selectXP(el, val) {
+  selectedXP = val;
+  document.querySelectorAll('#modal .chips button').forEach(c => {
+    if (['50 XP','100 XP','150 XP','200 XP'].includes(c.textContent)) c.classList.remove('selected');
+  });
+  el.classList.add('selected');
+}
+
+function selectProject(el, name) {
+  selectedProject = name;
+  document.getElementById('f-projects').querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+async function submitQuest() {
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) { document.getElementById('f-title').focus(); return; }
+  if (!selectedProject) { alert('Выбери проект'); return; }
+
+  const dateVal = document.getElementById('f-date').value;
+  const timeVal = document.getElementById('f-time').value;
+  let deadline = null;
+  if (dateVal && timeVal) {
+    deadline = new Date(dateVal + 'T' + timeVal).toISOString();
+  } else if (dateVal) {
+    deadline = new Date(dateVal + 'T12:00').toISOString();
+  }
+
+  const btn = document.querySelector('.submit-btn');
+  btn.textContent = 'Добавляю...';
+  btn.disabled = true;
+
+  const result = await api('quests', {
+    method: 'POST',
+    body: JSON.stringify({
+      player_id: PLAYER.id,
+      title,
+      project: selectedProject,
+      xp_reward: selectedXP,
+      status: 'active',
+      deadline
+    })
+  });
+
+  if (result && result[0]) {
+    ALL_QUESTS.unshift(result[0]);
+    renderQuests();
+    renderCalendarDays();
+  }
+
+  btn.textContent = 'Добавить квест';
+  btn.disabled = false;
+  closeModal();
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
 load();
 </script>
 </body>
