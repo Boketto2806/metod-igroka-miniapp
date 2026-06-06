@@ -147,7 +147,7 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
 .cal-quest-time { font-size: 11px; color: var(--text-muted); }
 
 /* Charts */
-.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.charts-row { display: flex; flex-direction: column; gap: 10px; }
 .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
 .chart-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-weight: 600; }
 .donut-wrap { position: relative; width: 90px; height: 90px; margin: 0 auto 10px; }
@@ -323,7 +323,7 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
       <div class="charts-row">
         <div class="chart-card">
           <div class="chart-label">XP за неделю</div>
-          <canvas id="barchart" height="130"></canvas>
+          <canvas id="barchart" height="120"></canvas>
         </div>
         <div class="chart-card">
           <div class="chart-label">По проектам</div>
