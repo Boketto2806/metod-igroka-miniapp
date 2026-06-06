@@ -20,6 +20,9 @@
   --amber: #f0a500;
   --amber-soft: #3d2800;
   --red: #ff5f5f;
+  --red-soft: #3d0000;
+  --blue: #3b82f6;
+  --blue-soft: #1e3a5f;
   --text: #e0e0f0;
   --text-muted: #5a5a7a;
   --text-dim: #8888aa;
@@ -30,34 +33,19 @@
 html, body { height: 100%; overflow: hidden; }
 body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; display: flex; flex-direction: column; }
 
-/* Scrollable pages */
 .app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 .page { flex: 1; overflow-y: auto; overflow-x: hidden; display: none; }
 .page.active { display: block; }
 .page-content { padding: 12px 14px 80px; display: flex; flex-direction: column; gap: 12px; }
 
 /* Header */
-.header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 14px;
-  flex-shrink: 0;
-}
+.header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 14px; flex-shrink: 0; }
 .header-top { display: flex; align-items: center; gap: 10px; }
-.avatar {
-  width: 40px; height: 40px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), #a855f7);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0;
-}
+.avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #a855f7); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0; }
 .header-info { flex: 1; min-width: 0; }
 .header-name { font-size: 15px; font-weight: 600; color: var(--text); }
 .header-level { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
-.streak-badge {
-  background: var(--amber-soft); border: 1px solid var(--amber);
-  border-radius: 20px; padding: 5px 10px;
-  font-size: 12px; color: var(--amber); font-weight: 600; flex-shrink: 0;
-}
+.streak-badge { background: var(--amber-soft); border: 1px solid var(--amber); border-radius: 20px; padding: 5px 10px; font-size: 12px; color: var(--amber); font-weight: 600; flex-shrink: 0; }
 .xp-bar-wrap { margin-top: 10px; }
 .xp-bar-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; }
 .xp-bar-labels span:last-child { color: var(--accent-text); }
@@ -70,32 +58,17 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
 .card-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; }
 .card-body { padding: 12px 14px; }
 
-/* Add quest button */
-.add-btn {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--accent-soft); border: 1px dashed var(--accent);
-  border-radius: var(--radius-sm); padding: 11px 14px;
-  color: var(--accent-text); font-size: 13px; font-weight: 500;
-  cursor: pointer; transition: all 0.15s; width: 100%;
-}
+/* Add button */
+.add-btn { display: flex; align-items: center; gap: 8px; background: var(--accent-soft); border: 1px dashed var(--accent); border-radius: var(--radius-sm); padding: 11px 14px; color: var(--accent-text); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; width: 100%; }
 .add-btn:active { opacity: 0.7; transform: scale(0.98); }
 .add-btn-icon { width: 20px; height: 20px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; flex-shrink: 0; }
 
 /* Quest items */
-.quest-item {
-  display: flex; align-items: flex-start; gap: 10px;
-  padding: 11px 0; border-bottom: 1px solid var(--border);
-  cursor: pointer; transition: opacity 0.15s;
-}
+.quest-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: opacity 0.15s; }
 .quest-item:last-child { border-bottom: none; padding-bottom: 0; }
 .quest-item:first-child { padding-top: 0; }
 .quest-item:active { opacity: 0.6; }
-.quest-cb {
-  width: 20px; height: 20px; border-radius: 6px;
-  border: 1.5px solid var(--border); flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  margin-top: 2px; transition: all 0.2s; font-size: 11px;
-}
+.quest-cb { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px; transition: all 0.2s; font-size: 11px; }
 .quest-cb.done { background: var(--accent); border-color: var(--accent); color: #fff; }
 .quest-body { flex: 1; min-width: 0; }
 .quest-title { font-size: 14px; color: var(--text); line-height: 1.4; }
@@ -103,10 +76,10 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
 .quest-meta { display: flex; align-items: center; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
 .quest-proj { font-size: 11px; color: var(--accent-text); background: var(--accent-soft); padding: 2px 8px; border-radius: 10px; }
 .quest-xp { font-size: 11px; color: var(--text-muted); }
-.quest-deadline { font-size: 11px; color: var(--amber); display: flex; align-items: center; gap: 3px; }
+.quest-deadline { font-size: 11px; color: var(--amber); }
 .quest-deadline.overdue { color: var(--red); }
 
-/* Stats grid */
+/* Stats */
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; }
 .stat-val { font-size: 24px; font-weight: 700; line-height: 1; }
@@ -117,138 +90,132 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
 
 /* Calendar */
 .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.cal-nav-btn { width: 30px; height: 30px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
-.cal-nav-btn:active { opacity: 0.6; }
+.cal-nav-btn { width: 30px; height: 30px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .cal-month { font-size: 14px; font-weight: 600; color: var(--text); }
 .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
-.cal-dow { text-align: center; font-size: 10px; color: var(--text-muted); font-weight: 600; padding: 4px 0; text-transform: uppercase; }
-.cal-day {
-  aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; cursor: pointer;
-  font-size: 12px; color: var(--text-dim); position: relative;
-  transition: all 0.15s; padding: 2px;
-}
-.cal-day:active { opacity: 0.6; }
-.cal-day.other-month { color: var(--text-muted); opacity: 0.3; }
+.cal-dow { text-align: center; font-size: 10px; color: var(--text-muted); font-weight: 600; padding: 4px 0; }
+.cal-day { aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; color: var(--text-dim); position: relative; transition: all 0.15s; }
+.cal-day.other-month { opacity: 0.3; }
 .cal-day.today { background: var(--accent-soft); color: var(--accent-text); font-weight: 700; border: 1px solid var(--accent); }
 .cal-day.selected { background: var(--accent); color: #fff; font-weight: 700; }
-.cal-day.has-quests::after {
-  content: ''; position: absolute; bottom: 3px;
-  width: 4px; height: 4px; border-radius: 50%; background: var(--green);
-}
+.cal-day.has-quests::after { content: ''; position: absolute; bottom: 3px; width: 4px; height: 4px; border-radius: 50%; background: var(--green); }
 .cal-day.today.has-quests::after, .cal-day.selected.has-quests::after { background: #fff; }
-.cal-day-num { line-height: 1; }
 .cal-selected-quests { margin-top: 12px; }
 .cal-selected-title { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
-.cal-quest-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--surface2); border-radius: var(--radius-sm); margin-bottom: 6px; border-left: 3px solid var(--accent); }
+.cal-quest-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--surface2); border-radius: var(--radius-sm); margin-bottom: 6px; border-left: 3px solid var(--accent); cursor: pointer; }
 .cal-quest-item.done-item { border-left-color: var(--green); opacity: 0.6; }
 .cal-quest-name { font-size: 13px; color: var(--text); flex: 1; }
 .cal-quest-xp { font-size: 11px; color: var(--accent-text); }
 .cal-quest-time { font-size: 11px; color: var(--text-muted); }
 
 /* Charts */
-.charts-row { display: flex; flex-direction: column; gap: 10px; }
+.charts-col { display: flex; flex-direction: column; gap: 10px; }
 .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
 .chart-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-weight: 600; }
 .donut-wrap { position: relative; width: 90px; height: 90px; margin: 0 auto 10px; }
-.donut-legend-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
 .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-dim); }
 .legend-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .legend-val { color: var(--text); font-weight: 600; margin-left: 2px; }
 
-/* Modal / Sheet */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-  display: flex; align-items: flex-end; z-index: 100;
-  opacity: 0; pointer-events: none; transition: opacity 0.25s;
+/* ── KANBAN ── */
+.kanban-page { flex: 1; overflow-x: auto; overflow-y: hidden; display: none; }
+.kanban-page.active { display: block; }
+.kanban-scroll { display: flex; gap: 10px; padding: 12px 14px 80px; min-height: calc(100vh - 120px); width: max-content; min-width: 100%; }
+.kanban-col { width: 220px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
+.kanban-col-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; }
+.kanban-col-header.active-col { background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent); }
+.kanban-col-header.completed-col { background: var(--green-soft); color: var(--green); border: 1px solid var(--green); }
+.kanban-col-header.failed-col { background: var(--red-soft); color: var(--red); border: 1px solid var(--red); }
+.kanban-col-header.postponed-col { background: var(--blue-soft); color: var(--blue); border: 1px solid var(--blue); }
+.kanban-col-count { font-size: 11px; opacity: 0.7; }
+.kanban-cards { flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 60px; border-radius: var(--radius-sm); padding: 4px; transition: background 0.15s; }
+.kanban-cards.drag-over { background: var(--surface2); }
+
+.kanban-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 12px;
+  cursor: grab; user-select: none; transition: all 0.15s;
+  touch-action: none;
 }
+.kanban-card:active { cursor: grabbing; opacity: 0.8; transform: scale(0.97); }
+.kanban-card.dragging { opacity: 0.4; }
+.kanban-card-title { font-size: 13px; color: var(--text); line-height: 1.4; margin-bottom: 7px; }
+.kanban-card-meta { display: flex; flex-wrap: wrap; gap: 5px; }
+.kanban-card-proj { font-size: 10px; color: var(--accent-text); background: var(--accent-soft); padding: 2px 7px; border-radius: 8px; }
+.kanban-card-xp { font-size: 10px; color: var(--text-muted); }
+.kanban-card-dl { font-size: 10px; color: var(--amber); }
+.kanban-card-dl.overdue { color: var(--red); }
+.kanban-card-desc { font-size: 11px; color: var(--text-muted); margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── MODALS ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: flex-end; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
 .modal-overlay.open { opacity: 1; pointer-events: all; }
-.modal-sheet {
-  width: 100%; background: var(--surface);
-  border-radius: 20px 20px 0 0; padding: 0 0 env(safe-area-inset-bottom);
-  transform: translateY(100%); transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-  max-height: 90vh; overflow-y: auto;
-}
+.modal-sheet { width: 100%; background: var(--surface); border-radius: 20px 20px 0 0; padding: 0 0 env(safe-area-inset-bottom); transform: translateY(100%); transition: transform 0.3s cubic-bezier(.4,0,.2,1); max-height: 92vh; overflow-y: auto; }
 .modal-overlay.open .modal-sheet { transform: translateY(0); }
 .modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 16px; }
 .modal-title { font-size: 17px; font-weight: 700; color: var(--text); padding: 0 16px 16px; }
 .form-group { padding: 0 16px 14px; }
 .form-label { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 7px; display: block; }
-.form-input {
-  width: 100%; background: var(--surface2); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 11px 12px;
-  color: var(--text); font-size: 14px; outline: none;
-  transition: border-color 0.15s; font-family: inherit;
-}
+.form-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 12px; color: var(--text); font-size: 14px; outline: none; transition: border-color 0.15s; font-family: inherit; }
 .form-input:focus { border-color: var(--accent); }
 .form-input::placeholder { color: var(--text-muted); }
+textarea.form-input { resize: none; min-height: 80px; }
 .chips { display: flex; flex-wrap: wrap; gap: 7px; }
-.chip {
-  padding: 7px 14px; border-radius: 20px;
-  background: var(--surface2); border: 1px solid var(--border);
-  color: var(--text-dim); font-size: 13px; cursor: pointer;
-  transition: all 0.15s; font-family: inherit;
-}
+.chip { padding: 7px 14px; border-radius: 20px; background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim); font-size: 13px; cursor: pointer; transition: all 0.15s; font-family: inherit; }
 .chip.selected { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
-.chip:active { opacity: 0.7; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.submit-btn {
-  width: calc(100% - 32px); margin: 4px 16px 16px;
-  background: var(--accent); border: none; border-radius: var(--radius-sm);
-  padding: 14px; color: #fff; font-size: 15px; font-weight: 600;
-  cursor: pointer; font-family: inherit; transition: opacity 0.15s;
-}
+.submit-btn { width: calc(100% - 32px); margin: 4px 16px 16px; background: var(--accent); border: none; border-radius: var(--radius-sm); padding: 14px; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
 .submit-btn:active { opacity: 0.8; }
 
+/* Quest detail modal */
+.detail-header { padding: 0 16px 12px; }
+.detail-title { font-size: 18px; font-weight: 700; color: var(--text); line-height: 1.4; margin-bottom: 10px; }
+.detail-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.detail-badge { font-size: 12px; padding: 4px 10px; border-radius: 10px; font-weight: 500; }
+.badge-proj { background: var(--accent-soft); color: var(--accent-text); }
+.badge-xp { background: var(--surface2); color: var(--text-dim); }
+.badge-dl { background: var(--amber-soft); color: var(--amber); }
+.badge-dl.overdue { background: var(--red-soft); color: var(--red); }
+.detail-desc { font-size: 14px; color: var(--text-dim); line-height: 1.6; padding: 12px; background: var(--surface2); border-radius: var(--radius-sm); margin-bottom: 4px; min-height: 60px; }
+.detail-desc.empty { color: var(--text-muted); font-style: italic; }
+.detail-section { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.status-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.status-btn { padding: 10px; border-radius: var(--radius-sm); border: 1px solid; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity 0.15s; text-align: center; }
+.status-btn:active { opacity: 0.7; }
+.status-btn.active-btn { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
+.status-btn.completed-btn { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+.status-btn.failed-btn { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+.status-btn.postponed-btn { background: var(--blue-soft); border-color: var(--blue); color: var(--blue); }
+.status-btn.current { opacity: 0.4; pointer-events: none; }
+.edit-desc-btn { width: 100%; padding: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-dim); font-size: 13px; cursor: pointer; font-family: inherit; margin-bottom: 8px; }
+
 /* Bottom tabs */
-.tabs {
-  display: flex; background: var(--surface);
-  border-top: 1px solid var(--border);
-  flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom);
-}
+.tabs { display: flex; background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom); }
 .tab { flex: 1; padding: 10px 4px; text-align: center; cursor: pointer; transition: color 0.15s; }
 .tab-icon { font-size: 18px; line-height: 1; }
 .tab-label { font-size: 10px; color: var(--text-muted); margin-top: 3px; font-weight: 500; }
 .tab.active .tab-label { color: var(--accent-text); }
-.tab.active .tab-icon { filter: drop-shadow(0 0 4px var(--accent)); }
 
 /* XP popup */
-.xp-popup {
-  position: fixed; top: 30%; left: 50%; transform: translate(-50%,-50%) scale(0);
-  background: var(--accent); color: #fff; padding: 12px 28px;
-  border-radius: 12px; font-size: 18px; font-weight: 700;
-  transition: all 0.25s cubic-bezier(.4,0,.2,1); z-index: 200;
-  pointer-events: none;
-}
+.xp-popup { position: fixed; top: 30%; left: 50%; transform: translate(-50%,-50%) scale(0); background: var(--accent); color: #fff; padding: 12px 28px; border-radius: 12px; font-size: 18px; font-weight: 700; transition: all 0.25s cubic-bezier(.4,0,.2,1); z-index: 200; pointer-events: none; }
 .xp-popup.show { transform: translate(-50%,-50%) scale(1); }
 
-/* Empty state */
 .empty { text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 13px; }
 .empty-icon { font-size: 28px; margin-bottom: 8px; }
-
-/* History item */
-.history-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+.history-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
 .history-item:last-child { border-bottom: none; }
 .history-check { width: 20px; height: 20px; border-radius: 6px; background: var(--green-soft); border: 1px solid var(--green); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--green); flex-shrink: 0; margin-top: 2px; }
-.history-body { flex: 1; }
-.history-title { font-size: 14px; color: var(--text-dim); text-decoration: line-through; }
-.history-meta { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
-
-/* Achievement */
 .achieve-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
 .achieve-item:last-child { border-bottom: none; }
 .achieve-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--amber-soft); border: 1px solid var(--amber); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
 .achieve-title { font-size: 14px; font-weight: 600; color: var(--text); }
 .achieve-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-
-/* Divider */
-.divider { height: 1px; background: var(--border); }
 </style>
 </head>
 <body>
-
 <div class="app">
+
   <!-- HEADER -->
   <div class="header">
     <div class="header-top">
@@ -272,14 +239,10 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
   <!-- PAGE: TODAY -->
   <div class="page active" id="page-today">
     <div class="page-content">
-
-      <!-- Add quest button -->
       <button class="add-btn" onclick="openAddModal()">
         <div class="add-btn-icon">+</div>
         Добавить квест
       </button>
-
-      <!-- Active quests -->
       <div class="card">
         <div class="card-header">
           <span class="card-title">Активные квесты</span>
@@ -289,12 +252,8 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
           <div class="empty"><div class="empty-icon">⚔️</div>Квестов пока нет</div>
         </div>
       </div>
-
-      <!-- Calendar -->
       <div class="card">
-        <div class="card-header">
-          <span class="card-title">Календарь</span>
-        </div>
+        <div class="card-header"><span class="card-title">Календарь</span></div>
         <div class="card-body">
           <div class="cal-nav">
             <button class="cal-nav-btn" onclick="calPrev()">‹</button>
@@ -306,7 +265,40 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
           <div class="cal-selected-quests" id="cal-quests"></div>
         </div>
       </div>
+    </div>
+  </div>
 
+  <!-- PAGE: KANBAN -->
+  <div class="kanban-page" id="page-kanban">
+    <div class="kanban-scroll" id="kanban-scroll">
+      <div class="kanban-col" id="col-active">
+        <div class="kanban-col-header active-col">
+          <span>⚔️ В работе</span>
+          <span class="kanban-col-count" id="cnt-active">0</span>
+        </div>
+        <div class="kanban-cards" id="cards-active" data-status="active" ondragover="onDragOver(event)" ondrop="onDrop(event)" ondragleave="onDragLeave(event)"></div>
+      </div>
+      <div class="kanban-col" id="col-completed">
+        <div class="kanban-col-header completed-col">
+          <span>✅ Завершён</span>
+          <span class="kanban-col-count" id="cnt-completed">0</span>
+        </div>
+        <div class="kanban-cards" id="cards-completed" data-status="completed" ondragover="onDragOver(event)" ondrop="onDrop(event)" ondragleave="onDragLeave(event)"></div>
+      </div>
+      <div class="kanban-col" id="col-failed">
+        <div class="kanban-col-header failed-col">
+          <span>💀 Провален</span>
+          <span class="kanban-col-count" id="cnt-failed">0</span>
+        </div>
+        <div class="kanban-cards" id="cards-failed" data-status="failed" ondragover="onDragOver(event)" ondrop="onDrop(event)" ondragleave="onDragLeave(event)"></div>
+      </div>
+      <div class="kanban-col" id="col-postponed">
+        <div class="kanban-col-header postponed-col">
+          <span>⏸ Отложен</span>
+          <span class="kanban-col-count" id="cnt-postponed">0</span>
+        </div>
+        <div class="kanban-cards" id="cards-postponed" data-status="postponed" ondragover="onDragOver(event)" ondrop="onDrop(event)" ondragleave="onDragLeave(event)"></div>
+      </div>
     </div>
   </div>
 
@@ -319,8 +311,7 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
         <div class="stat-card"><div class="stat-val amber" id="s-streak">0</div><div class="stat-lbl">Текущий streak</div></div>
         <div class="stat-card"><div class="stat-val" id="s-best">0</div><div class="stat-lbl">Лучший streak</div></div>
       </div>
-
-      <div class="charts-row">
+      <div class="charts-col">
         <div class="chart-card">
           <div class="chart-label">XP за неделю</div>
           <canvas id="barchart" height="120"></canvas>
@@ -360,51 +351,50 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
 
   <!-- TABS -->
   <div class="tabs">
-    <div class="tab active" onclick="showTab('today',this)" id="tab-today">
-      <div class="tab-icon">⚔️</div>
-      <div class="tab-label">Квесты</div>
+    <div class="tab active" onclick="showTab('today',this)">
+      <div class="tab-icon">⚔️</div><div class="tab-label">Квесты</div>
     </div>
-    <div class="tab" onclick="showTab('stats',this)" id="tab-stats">
-      <div class="tab-icon">📊</div>
-      <div class="tab-label">Статистика</div>
+    <div class="tab" onclick="showTab('kanban',this)">
+      <div class="tab-icon">📋</div><div class="tab-label">Доска</div>
     </div>
-    <div class="tab" onclick="showTab('history',this)" id="tab-history">
-      <div class="tab-icon">📜</div>
-      <div class="tab-label">История</div>
+    <div class="tab" onclick="showTab('stats',this)">
+      <div class="tab-icon">📊</div><div class="tab-label">Статы</div>
     </div>
-    <div class="tab" onclick="showTab('achieve',this)" id="tab-achieve">
-      <div class="tab-icon">🏆</div>
-      <div class="tab-label">Ачивки</div>
+    <div class="tab" onclick="showTab('history',this)">
+      <div class="tab-icon">📜</div><div class="tab-label">История</div>
+    </div>
+    <div class="tab" onclick="showTab('achieve',this)">
+      <div class="tab-icon">🏆</div><div class="tab-label">Ачивки</div>
     </div>
   </div>
 </div>
 
 <!-- ADD QUEST MODAL -->
-<div class="modal-overlay" id="modal" onclick="closeModalIfOutside(event)">
+<div class="modal-overlay" id="modal-add" onclick="closeModalIfOutside(event,'modal-add')">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title">Новый квест</div>
-
     <div class="form-group">
       <label class="form-label">Название</label>
       <input class="form-input" id="f-title" type="text" placeholder="Что нужно сделать?">
     </div>
-
+    <div class="form-group">
+      <label class="form-label">Описание (необязательно)</label>
+      <textarea class="form-input" id="f-desc" placeholder="Детали, заметки..."></textarea>
+    </div>
     <div class="form-group">
       <label class="form-label">Проект</label>
       <div class="chips" id="f-projects"></div>
     </div>
-
     <div class="form-group">
       <label class="form-label">Награда XP</label>
       <div class="chips">
         <button class="chip" onclick="selectXP(this,50)">50 XP</button>
-        <button class="chip" onclick="selectXP(this,100)">100 XP</button>
+        <button class="chip selected" onclick="selectXP(this,100)">100 XP</button>
         <button class="chip" onclick="selectXP(this,150)">150 XP</button>
         <button class="chip" onclick="selectXP(this,200)">200 XP</button>
       </div>
     </div>
-
     <div class="form-group">
       <label class="form-label">Дедлайн (необязательно)</label>
       <div class="form-row">
@@ -412,12 +402,47 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
         <input class="form-input" id="f-time" type="time">
       </div>
     </div>
-
     <button class="submit-btn" onclick="submitQuest()">Добавить квест</button>
   </div>
 </div>
 
-<!-- XP POPUP -->
+<!-- QUEST DETAIL MODAL -->
+<div class="modal-overlay" id="modal-detail" onclick="closeModalIfOutside(event,'modal-detail')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="detail-header">
+      <div class="detail-title" id="d-title"></div>
+      <div class="detail-badges" id="d-badges"></div>
+    </div>
+    <div class="form-group">
+      <div class="detail-section">Описание</div>
+      <div class="detail-desc" id="d-desc"></div>
+      <button class="edit-desc-btn" onclick="editDesc()" style="margin-top:8px">✏️ Редактировать описание</button>
+    </div>
+    <div class="form-group">
+      <div class="detail-section" style="margin-bottom:10px">Изменить статус</div>
+      <div class="status-btns">
+        <button class="status-btn active-btn" onclick="changeStatus('active')" id="sbtn-active">⚔️ В работе</button>
+        <button class="status-btn completed-btn" onclick="changeStatus('completed')" id="sbtn-completed">✅ Завершён</button>
+        <button class="status-btn failed-btn" onclick="changeStatus('failed')" id="sbtn-failed">💀 Провален</button>
+        <button class="status-btn postponed-btn" onclick="changeStatus('postponed')" id="sbtn-postponed">⏸ Отложен</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT DESC MODAL -->
+<div class="modal-overlay" id="modal-edit-desc" onclick="closeModalIfOutside(event,'modal-edit-desc')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Описание</div>
+    <div class="form-group">
+      <textarea class="form-input" id="edit-desc-input" placeholder="Детали, заметки..." style="min-height:120px"></textarea>
+    </div>
+    <button class="submit-btn" onclick="saveDesc()">Сохранить</button>
+  </div>
+</div>
+
 <div class="xp-popup" id="popup"></div>
 
 <script>
@@ -431,18 +456,13 @@ let calYear, calMonth, selectedDay = null;
 let selectedXP = 100;
 let selectedProject = null;
 let donutChart = null, barChart = null;
+let currentDetailId = null;
+let draggedId = null;
 
-// ── API ──────────────────────────────────────────────────────────────────────
-
+// ── API ───────────────────────────────────────────────────────────────────────
 async function api(path, opts = {}) {
   const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation',
-      ...opts.headers
-    },
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation', ...opts.headers },
     ...opts
   });
   if (res.status === 204) return null;
@@ -450,32 +470,27 @@ async function api(path, opts = {}) {
 }
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
-
 function showTab(name, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.page, .kanban-page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   el.classList.add('active');
   if (name === 'stats') renderStats();
+  if (name === 'kanban') renderKanban();
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-
 async function load() {
   const tg = window.Telegram?.WebApp;
   tg?.expand();
-  tg?.setHeaderColor('#13131a');
-
   const userId = tg?.initDataUnsafe?.user?.id || 1912211200;
   const firstName = tg?.initDataUnsafe?.user?.first_name || 'Игрок';
-
   document.getElementById('av').textContent = firstName[0].toUpperCase();
   document.getElementById('uname').textContent = firstName;
 
   const players = await api('players?telegram_id=eq.' + userId + '&select=*');
   if (!players || !players.length) return;
   PLAYER = players[0];
-
   renderHeader();
 
   ALL_QUESTS = await api('quests?player_id=eq.' + PLAYER.id + '&select=*&order=created_at.desc') || [];
@@ -488,7 +503,6 @@ async function load() {
 }
 
 // ── Header ────────────────────────────────────────────────────────────────────
-
 function renderHeader() {
   document.getElementById('ulevel').textContent = 'Уровень ' + PLAYER.level;
   document.getElementById('streak').textContent = '🔥 ' + PLAYER.streak + ' дней';
@@ -500,19 +514,15 @@ function renderHeader() {
 }
 
 // ── Quests ────────────────────────────────────────────────────────────────────
-
 function renderQuests() {
-  const active = ALL_QUESTS.filter(q => q.status === 'active');
+  const active = ALL_QUESTS.filter(q => q.board_status === 'active' || (!q.board_status && q.status === 'active'));
   document.getElementById('active-count').textContent = active.length;
   const el = document.getElementById('quest-list');
-  if (!active.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">⚔️</div>Квестов пока нет</div>';
-    return;
-  }
+  if (!active.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">⚔️</div>Квестов пока нет</div>'; return; }
   el.innerHTML = active.map(q => {
     const dl = formatDeadline(q.deadline);
     const overdue = q.deadline && new Date(q.deadline) < new Date();
-    return `<div class="quest-item" onclick="completeQuest(${q.id}, ${q.xp_reward}, this)">
+    return `<div class="quest-item" onclick="openDetail(${q.id})">
       <div class="quest-cb"></div>
       <div class="quest-body">
         <div class="quest-title">${q.title}</div>
@@ -521,6 +531,7 @@ function renderQuests() {
           <span class="quest-xp">+${q.xp_reward} XP</span>
           ${dl ? `<span class="quest-deadline${overdue?' overdue':''}">📅 ${dl}</span>` : ''}
         </div>
+        ${q.description ? `<div style="font-size:12px;color:var(--text-muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${q.description}</div>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -539,58 +550,241 @@ function formatDeadline(dl) {
   return d.toLocaleDateString('ru',{day:'numeric',month:'short'}) + ' ' + time;
 }
 
-// ── Complete Quest ─────────────────────────────────────────────────────────────
-
-async function completeQuest(questId, xpReward, el) {
-  el.querySelector('.quest-cb').classList.add('done');
-  el.querySelector('.quest-cb').textContent = '✓';
-  el.querySelector('.quest-title').classList.add('done');
-  el.style.pointerEvents = 'none';
-
-  await api('quests?id=eq.' + questId, {
-    method: 'PATCH',
-    body: JSON.stringify({ status: 'completed', completed_at: new Date().toISOString() })
-  });
-
-  let newXp = PLAYER.xp + xpReward;
-  let newLevel = PLAYER.level;
-  let leveled = false;
-  if (newXp >= PLAYER.xp_to_next) { newXp -= PLAYER.xp_to_next; newLevel++; leveled = true; }
-
-  await api('players?id=eq.' + PLAYER.id, {
-    method: 'PATCH',
-    body: JSON.stringify({ xp: newXp, level: newLevel, xp_to_next: newLevel * 100, last_active: new Date().toISOString() })
-  });
-
-  PLAYER.xp = newXp; PLAYER.level = newLevel; PLAYER.xp_to_next = newLevel * 100;
-  renderHeader();
-
+// ── Quest Detail ──────────────────────────────────────────────────────────────
+function openDetail(questId) {
   const q = ALL_QUESTS.find(q => q.id === questId);
-  if (q) q.status = 'completed';
+  if (!q) return;
+  currentDetailId = questId;
 
-  const popup = document.getElementById('popup');
-  popup.textContent = leveled ? `🎉 УРОВЕНЬ ${newLevel}!` : `+${xpReward} XP`;
-  popup.classList.add('show');
-  setTimeout(() => popup.classList.remove('show'), 1800);
+  document.getElementById('d-title').textContent = q.title;
 
-  setTimeout(() => { renderQuests(); renderHistory(); renderCalendarDays(); }, 400);
+  const dl = formatDeadline(q.deadline);
+  const overdue = q.deadline && new Date(q.deadline) < new Date();
+  document.getElementById('d-badges').innerHTML = `
+    <span class="detail-badge badge-proj">${q.project || 'Общее'}</span>
+    <span class="detail-badge badge-xp">+${q.xp_reward} XP</span>
+    ${dl ? `<span class="detail-badge badge-dl${overdue?' overdue':''}">📅 ${dl}</span>` : ''}
+  `;
+
+  const descEl = document.getElementById('d-desc');
+  if (q.description) { descEl.textContent = q.description; descEl.classList.remove('empty'); }
+  else { descEl.textContent = 'Описание не добавлено'; descEl.classList.add('empty'); }
+
+  // Highlight current status
+  ['active','completed','failed','postponed'].forEach(s => {
+    const btn = document.getElementById('sbtn-' + s);
+    const currentStatus = q.board_status || (q.status === 'completed' ? 'completed' : 'active');
+    btn.classList.toggle('current', currentStatus === s);
+  });
+
+  document.getElementById('modal-detail').classList.add('open');
+}
+
+async function changeStatus(newStatus) {
+  const q = ALL_QUESTS.find(q => q.id === currentDetailId);
+  if (!q) return;
+
+  const updates = { board_status: newStatus };
+  if (newStatus === 'completed') {
+    updates.status = 'completed';
+    updates.completed_at = new Date().toISOString();
+    // Award XP if not already completed
+    const wasActive = (q.board_status || 'active') === 'active';
+    if (wasActive) {
+      let newXp = PLAYER.xp + q.xp_reward;
+      let newLevel = PLAYER.level;
+      let leveled = false;
+      if (newXp >= PLAYER.xp_to_next) { newXp -= PLAYER.xp_to_next; newLevel++; leveled = true; }
+      await api('players?id=eq.' + PLAYER.id, { method: 'PATCH', body: JSON.stringify({ xp: newXp, level: newLevel, xp_to_next: newLevel * 100, last_active: new Date().toISOString() }) });
+      PLAYER.xp = newXp; PLAYER.level = newLevel; PLAYER.xp_to_next = newLevel * 100;
+      renderHeader();
+      const popup = document.getElementById('popup');
+      popup.textContent = leveled ? `🎉 УРОВЕНЬ ${newLevel}!` : `+${q.xp_reward} XP`;
+      popup.classList.add('show');
+      setTimeout(() => popup.classList.remove('show'), 1800);
+    }
+  } else {
+    updates.status = 'active';
+  }
+
+  await api('quests?id=eq.' + currentDetailId, { method: 'PATCH', body: JSON.stringify(updates) });
+  q.board_status = newStatus;
+  q.status = updates.status;
+  if (updates.completed_at) q.completed_at = updates.completed_at;
+
+  // Update status buttons
+  ['active','completed','failed','postponed'].forEach(s => {
+    document.getElementById('sbtn-' + s).classList.toggle('current', s === newStatus);
+  });
+
+  renderQuests();
+  renderHistory();
+  renderKanban();
+  closeModal('modal-detail');
+}
+
+function editDesc() {
+  const q = ALL_QUESTS.find(q => q.id === currentDetailId);
+  document.getElementById('edit-desc-input').value = q?.description || '';
+  document.getElementById('modal-edit-desc').classList.add('open');
+}
+
+async function saveDesc() {
+  const val = document.getElementById('edit-desc-input').value.trim();
+  await api('quests?id=eq.' + currentDetailId, { method: 'PATCH', body: JSON.stringify({ description: val }) });
+  const q = ALL_QUESTS.find(q => q.id === currentDetailId);
+  if (q) q.description = val;
+  const descEl = document.getElementById('d-desc');
+  if (val) { descEl.textContent = val; descEl.classList.remove('empty'); }
+  else { descEl.textContent = 'Описание не добавлено'; descEl.classList.add('empty'); }
+  renderQuests();
+  renderKanban();
+  closeModal('modal-edit-desc');
+}
+
+// ── Kanban ────────────────────────────────────────────────────────────────────
+function renderKanban() {
+  const statuses = ['active','completed','failed','postponed'];
+  statuses.forEach(s => {
+    const cards = ALL_QUESTS.filter(q => {
+      const bs = q.board_status || (q.status === 'completed' ? 'completed' : 'active');
+      return bs === s;
+    });
+    document.getElementById('cnt-' + s).textContent = cards.length;
+    const container = document.getElementById('cards-' + s);
+    if (!cards.length) {
+      container.innerHTML = `<div style="padding:12px;text-align:center;font-size:12px;color:var(--text-muted)">Пусто</div>`;
+      return;
+    }
+    container.innerHTML = cards.map(q => {
+      const dl = formatDeadline(q.deadline);
+      const overdue = q.deadline && new Date(q.deadline) < new Date();
+      return `<div class="kanban-card" draggable="true" data-id="${q.id}"
+        ondragstart="onDragStart(event,${q.id})"
+        ondragend="onDragEnd(event)"
+        onclick="openDetail(${q.id})">
+        <div class="kanban-card-title">${q.title}</div>
+        <div class="kanban-card-meta">
+          <span class="kanban-card-proj">${q.project || 'Общее'}</span>
+          <span class="kanban-card-xp">+${q.xp_reward} XP</span>
+          ${dl ? `<span class="kanban-card-dl${overdue?' overdue':''}">📅 ${dl}</span>` : ''}
+        </div>
+        ${q.description ? `<div class="kanban-card-desc">${q.description}</div>` : ''}
+      </div>`;
+    }).join('');
+
+    // Touch drag support
+    container.querySelectorAll('.kanban-card').forEach(card => {
+      addTouchDrag(card);
+    });
+  });
+}
+
+// ── Drag & Drop (mouse) ───────────────────────────────────────────────────────
+function onDragStart(e, id) {
+  draggedId = id;
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => e.target.classList.add('dragging'), 0);
+}
+function onDragEnd(e) { e.target.classList.remove('dragging'); }
+function onDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function onDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+async function onDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const newStatus = e.currentTarget.dataset.status;
+  if (!draggedId) return;
+  await updateQuestStatus(draggedId, newStatus);
+  draggedId = null;
+}
+
+// ── Touch Drag ────────────────────────────────────────────────────────────────
+function addTouchDrag(card) {
+  let startX, startY, clone, originalId;
+  card.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) return;
+    originalId = parseInt(card.dataset.id);
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+
+  card.addEventListener('touchmove', e => {
+    const dx = Math.abs(e.touches[0].clientX - startX);
+    const dy = Math.abs(e.touches[0].clientY - startY);
+    if (dx < 8 && dy < 8) return;
+    e.preventDefault();
+    if (!clone) {
+      clone = card.cloneNode(true);
+      clone.style.cssText = `position:fixed;width:${card.offsetWidth}px;opacity:0.8;z-index:999;pointer-events:none;transform:rotate(2deg);`;
+      document.body.appendChild(clone);
+      card.classList.add('dragging');
+    }
+    clone.style.left = (e.touches[0].clientX - card.offsetWidth/2) + 'px';
+    clone.style.top = (e.touches[0].clientY - 30) + 'px';
+
+    // Highlight target column
+    document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over'));
+    const el = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+    const col = el?.closest('.kanban-cards');
+    if (col) col.classList.add('drag-over');
+  }, { passive: false });
+
+  card.addEventListener('touchend', async e => {
+    card.classList.remove('dragging');
+    document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over'));
+    if (clone) {
+      const el = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      const col = el?.closest('.kanban-cards');
+      if (col && col.dataset.status) {
+        await updateQuestStatus(originalId, col.dataset.status);
+      }
+      clone.remove(); clone = null;
+    }
+  });
+}
+
+async function updateQuestStatus(questId, newStatus) {
+  const q = ALL_QUESTS.find(q => q.id === questId);
+  if (!q) return;
+  const currentStatus = q.board_status || (q.status === 'completed' ? 'completed' : 'active');
+  if (currentStatus === newStatus) return;
+
+  const updates = { board_status: newStatus };
+  if (newStatus === 'completed') {
+    updates.status = 'completed';
+    updates.completed_at = new Date().toISOString();
+    if (currentStatus === 'active') {
+      let newXp = PLAYER.xp + q.xp_reward;
+      let newLevel = PLAYER.level;
+      if (newXp >= PLAYER.xp_to_next) { newXp -= PLAYER.xp_to_next; newLevel++; }
+      await api('players?id=eq.' + PLAYER.id, { method: 'PATCH', body: JSON.stringify({ xp: newXp, level: newLevel, xp_to_next: newLevel * 100 }) });
+      PLAYER.xp = newXp; PLAYER.level = newLevel; PLAYER.xp_to_next = newLevel * 100;
+      renderHeader();
+      const popup = document.getElementById('popup');
+      popup.textContent = `+${q.xp_reward} XP`;
+      popup.classList.add('show');
+      setTimeout(() => popup.classList.remove('show'), 1500);
+    }
+  } else { updates.status = 'active'; }
+
+  await api('quests?id=eq.' + questId, { method: 'PATCH', body: JSON.stringify(updates) });
+  q.board_status = newStatus;
+  q.status = updates.status;
+  renderKanban();
+  renderQuests();
 }
 
 // ── History ───────────────────────────────────────────────────────────────────
-
 function renderHistory() {
-  const done = ALL_QUESTS.filter(q => q.status === 'completed');
+  const done = ALL_QUESTS.filter(q => q.board_status === 'completed' || q.status === 'completed');
   const el = document.getElementById('history-list');
-  if (!done.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">📜</div>История пуста</div>';
-    return;
-  }
+  if (!done.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">📜</div>История пуста</div>'; return; }
   el.innerHTML = done.map(q => `
-    <div class="history-item">
+    <div class="history-item" onclick="openDetail(${q.id})">
       <div class="history-check">✓</div>
-      <div class="history-body">
-        <div class="history-title">${q.title}</div>
-        <div class="history-meta">
+      <div style="flex:1">
+        <div style="font-size:14px;color:var(--text-dim);text-decoration:line-through">${q.title}</div>
+        <div class="quest-meta" style="margin-top:4px">
           <span class="quest-proj">${q.project || 'Общее'}</span>
           <span class="quest-xp">+${q.xp_reward} XP</span>
         </div>
@@ -599,27 +793,19 @@ function renderHistory() {
 }
 
 // ── Achievements ──────────────────────────────────────────────────────────────
-
 async function renderAchievements() {
   const data = await api('achievements?player_id=eq.' + PLAYER.id + '&select=*') || [];
   const el = document.getElementById('achieve-list');
-  if (!data.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">🏆</div>Достижений пока нет</div>';
-    return;
-  }
-  const icons = { 'Первый шаг': '👣', 'Десятка': '🔟', 'Полсотни': '💫', 'Неделя побед': '🔥', 'Месяц силы': '⚡', 'Опытный игрок': '🎖️' };
+  if (!data.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🏆</div>Достижений пока нет</div>'; return; }
+  const icons = {'Первый шаг':'👣','Десятка':'🔟','Полсотни':'💫','Неделя побед':'🔥','Месяц силы':'⚡','Опытный игрок':'🎖️'};
   el.innerHTML = data.map(a => `
     <div class="achieve-item">
-      <div class="achieve-icon">${icons[a.title] || '🏆'}</div>
-      <div>
-        <div class="achieve-title">${a.title}</div>
-        <div class="achieve-desc">${a.description}</div>
-      </div>
+      <div class="achieve-icon">${icons[a.title]||'🏆'}</div>
+      <div><div class="achieve-title">${a.title}</div><div class="achieve-desc">${a.description}</div></div>
     </div>`).join('');
 }
 
 // ── Stats ─────────────────────────────────────────────────────────────────────
-
 function renderStats() {
   const done = ALL_QUESTS.filter(q => q.status === 'completed');
   const totalXp = PLAYER.xp + (PLAYER.level - 1) * 100;
@@ -627,284 +813,130 @@ function renderStats() {
   document.getElementById('s-quests').textContent = done.length;
   document.getElementById('s-streak').textContent = PLAYER.streak;
   document.getElementById('s-best').textContent = PLAYER.best_streak;
-
   renderDonut();
   renderBarChart();
 }
 
 function renderDonut() {
-  const projectCounts = {};
-  ALL_QUESTS.forEach(q => {
-    const name = q.project || 'Общее';
-    projectCounts[name] = (projectCounts[name] || 0) + 1;
-  });
-
+  const counts = {};
+  ALL_QUESTS.forEach(q => { const n = q.project||'Общее'; counts[n]=(counts[n]||0)+1; });
   const colors = ['#6c5ce7','#00cfa8','#f0a500','#ff5f5f','#a855f7','#3b82f6'];
-  const labels = Object.keys(projectCounts);
-  const values = Object.values(projectCounts);
-
+  const labels = Object.keys(counts), values = Object.values(counts);
   if (donutChart) donutChart.destroy();
   donutChart = new Chart(document.getElementById('donut'), {
     type: 'doughnut',
-    data: {
-      datasets: [{
-        data: values.length ? values : [1],
-        backgroundColor: values.length ? labels.map((_,i) => colors[i % colors.length]) : ['#252535'],
-        borderWidth: 0
-      }]
-    },
+    data: { datasets: [{ data: values.length?values:[1], backgroundColor: values.length?labels.map((_,i)=>colors[i%colors.length]):['#252535'], borderWidth: 0 }] },
     options: { cutout: '70%', plugins: { legend: { display: false }, tooltip: { enabled: false } } }
   });
-
-  const legend = document.getElementById('donut-legend');
-  legend.innerHTML = labels.map((lbl, i) => `
-    <div class="legend-item">
-      <div class="legend-dot" style="background:${colors[i % colors.length]}"></div>
-      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70px">${lbl}</span>
-      <span class="legend-val">${values[i]}</span>
-    </div>`).join('');
+  document.getElementById('donut-legend').innerHTML = labels.map((l,i)=>`
+    <div class="legend-item"><div class="legend-dot" style="background:${colors[i%colors.length]}"></div><span>${l}</span><span class="legend-val">${values[i]}</span></div>`).join('');
 }
 
-async function renderBarChart() {
-  // Реальные данные XP за последние 7 дней
-  const days = [];
-  const labels = [];
+function renderBarChart() {
   const dayNames = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
   const now = new Date();
-
+  const labels = [], xpData = [];
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(now);
-    d.setDate(now.getDate() - i);
+    const d = new Date(now); d.setDate(now.getDate()-i);
     const start = new Date(d); start.setHours(0,0,0,0);
     const end = new Date(d); end.setHours(23,59,59,999);
-    days.push({ start, end });
     labels.push(dayNames[d.getDay()]);
+    xpData.push(ALL_QUESTS.filter(q=>q.status==='completed'&&q.completed_at).filter(q=>{const t=new Date(q.completed_at);return t>=start&&t<=end;}).reduce((s,q)=>s+(q.xp_reward||0),0));
   }
-
-  const xpData = days.map(({ start, end }) => {
-    return ALL_QUESTS
-      .filter(q => q.status === 'completed' && q.completed_at)
-      .filter(q => {
-        const t = new Date(q.completed_at);
-        return t >= start && t <= end;
-      })
-      .reduce((sum, q) => sum + (q.xp_reward || 0), 0);
-  });
-
   if (barChart) barChart.destroy();
   barChart = new Chart(document.getElementById('barchart'), {
     type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        data: xpData,
-        backgroundColor: xpData.map((_, i) => i === 6 ? '#6c5ce7' : '#2d2750'),
-        borderRadius: 4,
-        borderSkipped: false
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false }, tooltip: { enabled: true } },
-      scales: {
-        x: { ticks: { color: '#5a5a7a', font: { size: 10 } }, grid: { display: false } },
-        y: { ticks: { color: '#5a5a7a', font: { size: 10 } }, grid: { color: '#1a1a24' } }
-      }
-    }
+    data: { labels, datasets: [{ data: xpData, backgroundColor: xpData.map((_,i)=>i===6?'#6c5ce7':'#2d2750'), borderRadius: 4, borderSkipped: false }] },
+    options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#5a5a7a', font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: '#5a5a7a', font: { size: 10 } }, grid: { color: '#1a1a24' } } } }
   });
 }
 
 // ── Calendar ──────────────────────────────────────────────────────────────────
-
 function initCalendar() {
-  const now = new Date();
-  calYear = now.getFullYear();
-  calMonth = now.getMonth();
-  selectedDay = now.getDate();
+  const now = new Date(); calYear = now.getFullYear(); calMonth = now.getMonth(); selectedDay = now.getDate();
   renderCalendar();
 }
-
-function calPrev() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
-function calNext() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); }
-
+function calPrev() { calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+function calNext() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
 function renderCalendar() {
-  const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-  document.getElementById('cal-month-title').textContent = monthNames[calMonth] + ' ' + calYear;
-
-  const dowEl = document.getElementById('cal-dow');
-  const dows = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
-  dowEl.innerHTML = dows.map(d => `<div class="cal-dow">${d}</div>`).join('');
-
+  const months = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  document.getElementById('cal-month-title').textContent = months[calMonth]+' '+calYear;
+  document.getElementById('cal-dow').innerHTML = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(d=>`<div class="cal-dow">${d}</div>`).join('');
   renderCalendarDays();
 }
-
 function renderCalendarDays() {
   const today = new Date();
-  const firstDay = new Date(calYear, calMonth, 1);
-  let startDow = firstDay.getDay(); // 0=Sun
-  startDow = startDow === 0 ? 6 : startDow - 1; // Mon=0
-
-  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-  const daysInPrev = new Date(calYear, calMonth, 0).getDate();
-
-  // Build deadline map: 'YYYY-MM-DD' -> quests[]
+  let startDow = new Date(calYear,calMonth,1).getDay(); startDow = startDow===0?6:startDow-1;
+  const daysInMonth = new Date(calYear,calMonth+1,0).getDate();
+  const daysInPrev = new Date(calYear,calMonth,0).getDate();
   const deadlineMap = {};
-  ALL_QUESTS.forEach(q => {
-    if (q.deadline) {
-      const d = new Date(q.deadline);
-      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-      if (!deadlineMap[key]) deadlineMap[key] = [];
-      deadlineMap[key].push(q);
-    }
-  });
-
-  let html = '';
-  // Prev month days
-  for (let i = startDow - 1; i >= 0; i--) {
-    html += `<div class="cal-day other-month"><span class="cal-day-num">${daysInPrev - i}</span></div>`;
+  ALL_QUESTS.forEach(q=>{if(q.deadline){const d=new Date(q.deadline);const k=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;if(!deadlineMap[k])deadlineMap[k]=[];deadlineMap[k].push(q);}});
+  let html='';
+  for(let i=startDow-1;i>=0;i--) html+=`<div class="cal-day other-month"><span>${daysInPrev-i}</span></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const isToday=d===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear();
+    const isSelected=d===selectedDay;
+    const key=`${calYear}-${calMonth}-${d}`;
+    let cls='cal-day'+(isSelected?' selected':isToday?' today':'')+(deadlineMap[key]?' has-quests':'');
+    html+=`<div class="${cls}" onclick="selectCalDay(${d})"><span>${d}</span></div>`;
   }
-  // Current month
-  for (let d = 1; d <= daysInMonth; d++) {
-    const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
-    const isSelected = d === selectedDay;
-    const key = `${calYear}-${calMonth}-${d}`;
-    const hasQuests = !!deadlineMap[key];
-    let cls = 'cal-day';
-    if (isSelected) cls += ' selected';
-    else if (isToday) cls += ' today';
-    if (hasQuests) cls += ' has-quests';
-    html += `<div class="${cls}" onclick="selectCalDay(${d})"><span class="cal-day-num">${d}</span></div>`;
-  }
-  // Next month
-  const totalCells = startDow + daysInMonth;
-  const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
-  for (let i = 1; i <= remaining; i++) {
-    html += `<div class="cal-day other-month"><span class="cal-day-num">${i}</span></div>`;
-  }
-
-  document.getElementById('cal-days').innerHTML = html;
+  const rem=(startDow+daysInMonth)%7; if(rem) for(let i=1;i<=7-rem;i++) html+=`<div class="cal-day other-month"><span>${i}</span></div>`;
+  document.getElementById('cal-days').innerHTML=html;
   renderCalendarQuests(deadlineMap);
 }
-
-function selectCalDay(d) {
-  selectedDay = d;
-  renderCalendarDays();
-}
-
-function renderCalendarQuests(deadlineMap) {
-  const key = `${calYear}-${calMonth}-${selectedDay}`;
-  const quests = deadlineMap[key] || [];
-  const el = document.getElementById('cal-quests');
-
-  if (!selectedDay) { el.innerHTML = ''; return; }
-
-  const dateStr = new Date(calYear, calMonth, selectedDay).toLocaleDateString('ru', { day:'numeric', month:'long' });
-  el.innerHTML = `<div class="cal-selected-title">${dateStr}</div>`;
-
-  if (!quests.length) {
-    el.innerHTML += '<div style="font-size:13px;color:var(--text-muted);padding:4px 0">Нет квестов на этот день</div>';
-    return;
-  }
-
-  el.innerHTML += quests.map(q => {
-    const time = new Date(q.deadline).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
-    return `<div class="cal-quest-item${q.status==='completed'?' done-item':''}">
-      <div style="flex:1">
-        <div class="cal-quest-name">${q.title}</div>
-        <span class="quest-proj" style="font-size:10px">${q.project||'Общее'}</span>
-      </div>
-      <div style="text-align:right">
-        <div class="cal-quest-xp">+${q.xp_reward} XP</div>
-        <div class="cal-quest-time">${time}</div>
-      </div>
+function selectCalDay(d){selectedDay=d;renderCalendarDays();}
+function renderCalendarQuests(deadlineMap){
+  const key=`${calYear}-${calMonth}-${selectedDay}`;
+  const quests=deadlineMap[key]||[];
+  const el=document.getElementById('cal-quests');
+  const dateStr=new Date(calYear,calMonth,selectedDay).toLocaleDateString('ru',{day:'numeric',month:'long'});
+  el.innerHTML=`<div class="cal-selected-title">${dateStr}</div>`;
+  if(!quests.length){el.innerHTML+='<div style="font-size:13px;color:var(--text-muted)">Нет квестов</div>';return;}
+  el.innerHTML+=quests.map(q=>{
+    const time=new Date(q.deadline).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="cal-quest-item${q.status==='completed'?' done-item':''}" onclick="openDetail(${q.id})">
+      <div style="flex:1"><div class="cal-quest-name">${q.title}</div><span class="quest-proj" style="font-size:10px">${q.project||'Общее'}</span></div>
+      <div style="text-align:right"><div class="cal-quest-xp">+${q.xp_reward} XP</div><div class="cal-quest-time">${time}</div></div>
     </div>`;
   }).join('');
 }
 
 // ── Add Quest Modal ───────────────────────────────────────────────────────────
+function openAddModal(){
+  document.getElementById('f-projects').innerHTML=PROJECTS.map(p=>`<button class="chip" onclick="selectProject(this,'${p.name}')">${p.name}</button>`).join('')+`<button class="chip" onclick="selectProject(this,'Другое')">Другое</button>`;
+  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('f-time').value='';
+  document.getElementById('f-title').value='';
+  document.getElementById('f-desc').value='';
+  selectedXP=100; selectedProject=null;
+  document.querySelectorAll('#modal-add .chip').forEach(c=>c.classList.remove('selected'));
+  document.querySelector('#modal-add .chips button:nth-child(2)')?.classList.add('selected');
+  document.getElementById('modal-add').classList.add('open');
+  setTimeout(()=>document.getElementById('f-title').focus(),300);
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function closeModalIfOutside(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+function selectXP(el,val){selectedXP=val;document.querySelectorAll('#modal-add .chips button').forEach(c=>{if(['50 XP','100 XP','150 XP','200 XP'].includes(c.textContent))c.classList.remove('selected');});el.classList.add('selected');}
+function selectProject(el,name){selectedProject=name;document.getElementById('f-projects').querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');}
 
-function openAddModal() {
-  // Populate projects
-  const el = document.getElementById('f-projects');
-  el.innerHTML = PROJECTS.map(p => `<button class="chip" onclick="selectProject(this,'${p.name}')">${p.name}</button>`).join('') +
-    `<button class="chip" onclick="selectProject(this,'Другое')">Другое</button>`;
-
-  // Set default date to today
-  const today = new Date();
-  document.getElementById('f-date').value = today.toISOString().split('T')[0];
-  document.getElementById('f-time').value = '';
-  document.getElementById('f-title').value = '';
-  selectedXP = 100;
-  selectedProject = null;
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
-
-  document.getElementById('modal').classList.add('open');
-  setTimeout(() => document.getElementById('f-title').focus(), 300);
+async function submitQuest(){
+  const title=document.getElementById('f-title').value.trim();
+  if(!title){document.getElementById('f-title').focus();return;}
+  if(!selectedProject){alert('Выбери проект');return;}
+  const desc=document.getElementById('f-desc').value.trim();
+  const dateVal=document.getElementById('f-date').value;
+  const timeVal=document.getElementById('f-time').value;
+  let deadline=null;
+  if(dateVal&&timeVal) deadline=new Date(dateVal+'T'+timeVal).toISOString();
+  else if(dateVal) deadline=new Date(dateVal+'T12:00').toISOString();
+  const btn=document.querySelector('#modal-add .submit-btn');
+  btn.textContent='Добавляю...'; btn.disabled=true;
+  const result=await api('quests',{method:'POST',body:JSON.stringify({player_id:PLAYER.id,title,description:desc||null,project:selectedProject,xp_reward:selectedXP,status:'active',board_status:'active',deadline})});
+  if(result&&result[0]){ALL_QUESTS.unshift(result[0]);renderQuests();renderCalendarDays();}
+  btn.textContent='Добавить квест'; btn.disabled=false;
+  closeModal('modal-add');
 }
 
-function closeModal() {
-  document.getElementById('modal').classList.remove('open');
-}
-
-function closeModalIfOutside(e) {
-  if (e.target === document.getElementById('modal')) closeModal();
-}
-
-function selectXP(el, val) {
-  selectedXP = val;
-  document.querySelectorAll('#modal .chips button').forEach(c => {
-    if (['50 XP','100 XP','150 XP','200 XP'].includes(c.textContent)) c.classList.remove('selected');
-  });
-  el.classList.add('selected');
-}
-
-function selectProject(el, name) {
-  selectedProject = name;
-  document.getElementById('f-projects').querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-}
-
-async function submitQuest() {
-  const title = document.getElementById('f-title').value.trim();
-  if (!title) { document.getElementById('f-title').focus(); return; }
-  if (!selectedProject) { alert('Выбери проект'); return; }
-
-  const dateVal = document.getElementById('f-date').value;
-  const timeVal = document.getElementById('f-time').value;
-  let deadline = null;
-  if (dateVal && timeVal) {
-    deadline = new Date(dateVal + 'T' + timeVal).toISOString();
-  } else if (dateVal) {
-    deadline = new Date(dateVal + 'T12:00').toISOString();
-  }
-
-  const btn = document.querySelector('.submit-btn');
-  btn.textContent = 'Добавляю...';
-  btn.disabled = true;
-
-  const result = await api('quests', {
-    method: 'POST',
-    body: JSON.stringify({
-      player_id: PLAYER.id,
-      title,
-      project: selectedProject,
-      xp_reward: selectedXP,
-      status: 'active',
-      deadline
-    })
-  });
-
-  if (result && result[0]) {
-    ALL_QUESTS.unshift(result[0]);
-    renderQuests();
-    renderCalendarDays();
-  }
-
-  btn.textContent = 'Добавить квест';
-  btn.disabled = false;
-  closeModal();
-}
-
-// ── Boot ──────────────────────────────────────────────────────────────────────
 load();
 </script>
 </body>
