@@ -587,36 +587,93 @@ function openDetail(questId) {
 async function changeStatus(newStatus) {
   const q = ALL_QUESTS.find(q => q.id === currentDetailId);
   if (!q) return;
+  const currentStatus = q.board_status || (q.status === 'completed' ? 'completed' : 'active');
+  if (currentStatus === newStatus) return;
 
   const updates = { board_status: newStatus };
-  if (newStatus === 'completed') {
+  let xpDelta = 0;
+
+  if (newStatus === 'completed' && !q.xp_awarded) {
+    // Первое завершение — начисляем XP
     updates.status = 'completed';
     updates.completed_at = new Date().toISOString();
-    // Award XP if not already completed
-    const wasActive = (q.board_status || 'active') === 'active';
-    if (wasActive) {
-      let newXp = PLAYER.xp + q.xp_reward;
-      let newLevel = PLAYER.level;
-      let leveled = false;
-      if (newXp >= PLAYER.xp_to_next) { newXp -= PLAYER.xp_to_next; newLevel++; leveled = true; }
-      await api('players?id=eq.' + PLAYER.id, { method: 'PATCH', body: JSON.stringify({ xp: newXp, level: newLevel, xp_to_next: newLevel * 100, last_active: new Date().toISOString() }) });
-      PLAYER.xp = newXp; PLAYER.level = newLevel; PLAYER.xp_to_next = newLevel * 100;
-      renderHeader();
-      const popup = document.getElementById('popup');
-      popup.textContent = leveled ? `🎉 УРОВЕНЬ ${newLevel}!` : `+${q.xp_reward} XP`;
-      popup.classList.add('show');
-      setTimeout(() => popup.classList.remove('show'), 1800);
+    updates.xp_awarded = true;
+    xpDelta = q.xp_reward;
+  } else if (newStatus === 'completed' && q.xp_awarded) {
+    // Уже был завершён — просто меняем статус, XP не начисляем
+    updates.status = 'completed';
+    updates.completed_at = new Date().toISOString();
+  } else if (newStatus === 'active' && q.xp_awarded) {
+    // Возврат из завершённых — отнимаем XP обратно
+    updates.status = 'active';
+    updates.xp_awarded = false;
+    xpDelta = -q.xp_reward;
+  } else if (newStatus === 'failed') {
+    // Провал — штраф половина XP
+    updates.status = 'active';
+    if (q.xp_awarded) {
+      // Если уже получал XP — отнимаем полную награду + штраф
+      updates.xp_awarded = false;
+      xpDelta = -q.xp_reward - Math.floor(q.xp_reward / 2);
+    } else {
+      // Не получал — только штраф
+      xpDelta = -Math.floor(q.xp_reward / 2);
+    }
+  } else if (newStatus === 'postponed') {
+    updates.status = 'active';
+    if (q.xp_awarded) {
+      // Возврат XP если был завершён
+      updates.xp_awarded = false;
+      xpDelta = -q.xp_reward;
     }
   } else {
     updates.status = 'active';
   }
 
+  // Применяем XP изменение
+  if (xpDelta !== 0) {
+    let newXp = PLAYER.xp + xpDelta;
+    let newLevel = PLAYER.level;
+    let leveled = false;
+
+    if (xpDelta > 0) {
+      // Левелап
+      if (newXp >= PLAYER.xp_to_next) { newXp -= PLAYER.xp_to_next; newLevel++; leveled = true; }
+    } else {
+      // Не уходим в минус на текущем уровне
+      if (newXp < 0) {
+        if (newLevel > 1) {
+          newLevel--;
+          newXp = (newLevel * 100) + newXp;
+          if (newXp < 0) newXp = 0;
+        } else {
+          newXp = 0;
+        }
+      }
+    }
+
+    await api('players?id=eq.' + PLAYER.id, {
+      method: 'PATCH',
+      body: JSON.stringify({ xp: newXp, level: newLevel, xp_to_next: newLevel * 100, last_active: new Date().toISOString() })
+    });
+    PLAYER.xp = newXp; PLAYER.level = newLevel; PLAYER.xp_to_next = newLevel * 100;
+    renderHeader();
+
+    const popup = document.getElementById('popup');
+    if (leveled) popup.textContent = `🎉 УРОВЕНЬ ${newLevel}!`;
+    else if (xpDelta > 0) popup.textContent = `+${xpDelta} XP`;
+    else if (newStatus === 'failed') popup.textContent = `💀 -${Math.abs(xpDelta)} XP`;
+    else popup.textContent = `-${Math.abs(xpDelta)} XP`;
+    popup.classList.add('show');
+    setTimeout(() => popup.classList.remove('show'), 1800);
+  }
+
   await api('quests?id=eq.' + currentDetailId, { method: 'PATCH', body: JSON.stringify(updates) });
   q.board_status = newStatus;
   q.status = updates.status;
+  if (updates.xp_awarded !== undefined) q.xp_awarded = updates.xp_awarded;
   if (updates.completed_at) q.completed_at = updates.completed_at;
 
-  // Update status buttons
   ['active','completed','failed','postponed'].forEach(s => {
     document.getElementById('sbtn-' + s).classList.toggle('current', s === newStatus);
   });
@@ -814,26 +871,66 @@ async function updateQuestStatus(questId, newStatus) {
   if (currentStatus === newStatus) return;
 
   const updates = { board_status: newStatus };
-  if (newStatus === 'completed') {
+  let xpDelta = 0;
+
+  if (newStatus === 'completed' && !q.xp_awarded) {
     updates.status = 'completed';
     updates.completed_at = new Date().toISOString();
-    if (currentStatus === 'active') {
-      let newXp = PLAYER.xp + q.xp_reward;
-      let newLevel = PLAYER.level;
-      if (newXp >= PLAYER.xp_to_next) { newXp -= PLAYER.xp_to_next; newLevel++; }
-      await api('players?id=eq.' + PLAYER.id, { method: 'PATCH', body: JSON.stringify({ xp: newXp, level: newLevel, xp_to_next: newLevel * 100 }) });
-      PLAYER.xp = newXp; PLAYER.level = newLevel; PLAYER.xp_to_next = newLevel * 100;
-      renderHeader();
-      const popup = document.getElementById('popup');
-      popup.textContent = `+${q.xp_reward} XP`;
-      popup.classList.add('show');
-      setTimeout(() => popup.classList.remove('show'), 1500);
+    updates.xp_awarded = true;
+    xpDelta = q.xp_reward;
+  } else if (newStatus === 'completed' && q.xp_awarded) {
+    updates.status = 'completed';
+    updates.completed_at = new Date().toISOString();
+  } else if (newStatus === 'active' && q.xp_awarded) {
+    updates.status = 'active';
+    updates.xp_awarded = false;
+    xpDelta = -q.xp_reward;
+  } else if (newStatus === 'failed') {
+    updates.status = 'active';
+    if (q.xp_awarded) {
+      updates.xp_awarded = false;
+      xpDelta = -q.xp_reward - Math.floor(q.xp_reward / 2);
+    } else {
+      xpDelta = -Math.floor(q.xp_reward / 2);
     }
-  } else { updates.status = 'active'; }
+  } else if (newStatus === 'postponed') {
+    updates.status = 'active';
+    if (q.xp_awarded) {
+      updates.xp_awarded = false;
+      xpDelta = -q.xp_reward;
+    }
+  } else {
+    updates.status = 'active';
+  }
+
+  if (xpDelta !== 0) {
+    let newXp = PLAYER.xp + xpDelta;
+    let newLevel = PLAYER.level;
+    let leveled = false;
+    if (xpDelta > 0) {
+      if (newXp >= PLAYER.xp_to_next) { newXp -= PLAYER.xp_to_next; newLevel++; leveled = true; }
+    } else {
+      if (newXp < 0) {
+        if (newLevel > 1) { newLevel--; newXp = (newLevel * 100) + newXp; if (newXp < 0) newXp = 0; }
+        else newXp = 0;
+      }
+    }
+    await api('players?id=eq.' + PLAYER.id, { method: 'PATCH', body: JSON.stringify({ xp: newXp, level: newLevel, xp_to_next: newLevel * 100 }) });
+    PLAYER.xp = newXp; PLAYER.level = newLevel; PLAYER.xp_to_next = newLevel * 100;
+    renderHeader();
+    const popup = document.getElementById('popup');
+    if (leveled) popup.textContent = `🎉 УРОВЕНЬ ${newLevel}!`;
+    else if (xpDelta > 0) popup.textContent = `+${xpDelta} XP`;
+    else if (newStatus === 'failed') popup.textContent = `💀 -${Math.abs(xpDelta)} XP`;
+    else popup.textContent = `-${Math.abs(xpDelta)} XP`;
+    popup.classList.add('show');
+    setTimeout(() => popup.classList.remove('show'), 1500);
+  }
 
   await api('quests?id=eq.' + questId, { method: 'PATCH', body: JSON.stringify(updates) });
   q.board_status = newStatus;
   q.status = updates.status;
+  if (updates.xp_awarded !== undefined) q.xp_awarded = updates.xp_awarded;
   renderKanban();
   renderQuests();
 }
