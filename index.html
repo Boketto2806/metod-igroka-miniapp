@@ -730,12 +730,12 @@ function addTouchDrag(card) {
 
     // Auto-scroll kanban horizontally when near edges
     const kanban = document.getElementById('kanban-scroll');
-    const edgeSize = 60;
+    const edgeSize = 80;
     const rect = kanban.getBoundingClientRect();
     if (touchX > rect.right - edgeSize) {
-      kanban.scrollLeft += 8;
+      kanban.scrollLeft += 15;
     } else if (touchX < rect.left + edgeSize) {
-      kanban.scrollLeft -= 8;
+      kanban.scrollLeft -= 15;
     }
 
     // Highlight target column
