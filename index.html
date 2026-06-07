@@ -432,6 +432,10 @@ textarea.form-input { resize: none; min-height: 80px; }
         <button class="status-btn postponed-btn" onclick="changeStatus('postponed')" id="sbtn-postponed">⏸ Отложен</button>
       </div>
     </div>
+    <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="edit-desc-btn" onclick="openEditQuest()" style="margin:0;color:var(--accent-text);border-color:var(--accent)">✏️ Редактировать</button>
+      <button class="edit-desc-btn" onclick="confirmDelete()" style="margin:0;color:var(--red);border-color:var(--red)">🗑 Удалить</button>
+    </div>
   </div>
 </div>
 
@@ -444,6 +448,43 @@ textarea.form-input { resize: none; min-height: 80px; }
       <textarea class="form-input" id="edit-desc-input" placeholder="Детали, заметки..." style="min-height:120px"></textarea>
     </div>
     <button class="submit-btn" onclick="saveDesc()">Сохранить</button>
+  </div>
+</div>
+
+<!-- EDIT QUEST MODAL -->
+<div class="modal-overlay" id="modal-edit-quest" onclick="closeModalIfOutside(event,'modal-edit-quest')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Редактировать квест</div>
+    <div class="form-group">
+      <label class="form-label">Название</label>
+      <input class="form-input" id="eq-title" type="text">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Описание</label>
+      <textarea class="form-input" id="eq-desc" placeholder="Детали, заметки..." style="min-height:80px"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Проект</label>
+      <div class="chips" id="eq-projects"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Награда XP</label>
+      <div class="chips" id="eq-xp-chips">
+        <button class="chip" onclick="selectEditXP(this,50)">50 XP</button>
+        <button class="chip" onclick="selectEditXP(this,100)">100 XP</button>
+        <button class="chip" onclick="selectEditXP(this,150)">150 XP</button>
+        <button class="chip" onclick="selectEditXP(this,200)">200 XP</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Дедлайн</label>
+      <div class="form-row">
+        <input class="form-input" id="eq-date" type="date">
+        <input class="form-input" id="eq-time" type="time">
+      </div>
+    </div>
+    <button class="submit-btn" onclick="saveEditQuest()">Сохранить изменения</button>
   </div>
 </div>
 
@@ -519,7 +560,14 @@ function renderHeader() {
 
 // ── Quests ────────────────────────────────────────────────────────────────────
 function renderQuests() {
-  const active = ALL_QUESTS.filter(q => q.board_status === 'active' || (!q.board_status && q.status === 'active'));
+  let active = ALL_QUESTS.filter(q => q.board_status === 'active' || (!q.board_status && q.status === 'active'));
+  // Сортировка: сначала с дедлайном (ближайший первый), потом без дедлайна
+  active.sort((a, b) => {
+    if (a.deadline && b.deadline) return new Date(a.deadline) - new Date(b.deadline);
+    if (a.deadline) return -1;
+    if (b.deadline) return 1;
+    return 0;
+  });
   document.getElementById('active-count').textContent = active.length;
   const el = document.getElementById('quest-list');
   if (!active.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">⚔️</div>Квестов пока нет</div>'; return; }
@@ -690,7 +738,100 @@ function editDesc() {
   document.getElementById('modal-edit-desc').classList.add('open');
 }
 
-async function saveDesc() {
+let editXP = 100;
+let editProject = null;
+
+function openEditQuest() {
+  const q = ALL_QUESTS.find(q => q.id === currentDetailId);
+  if (!q) return;
+
+  document.getElementById('eq-title').value = q.title || '';
+  document.getElementById('eq-desc').value = q.description || '';
+
+  // Projects chips
+  document.getElementById('eq-projects').innerHTML = PROJECTS.map(p =>
+    `<button class="chip${q.project===p.name?' selected':''}" onclick="selectEditProject(this,'${p.name}')">${p.name}</button>`
+  ).join('') + `<button class="chip${q.project==='Другое'?' selected':''}" onclick="selectEditProject(this,'Другое')">Другое</button>`;
+  editProject = q.project || null;
+
+  // XP chips
+  editXP = q.xp_reward || 100;
+  document.querySelectorAll('#eq-xp-chips .chip').forEach(c => {
+    c.classList.toggle('selected', parseInt(c.textContent) === editXP);
+  });
+
+  // Deadline
+  if (q.deadline) {
+    const d = new Date(q.deadline);
+    document.getElementById('eq-date').value = d.toISOString().split('T')[0];
+    document.getElementById('eq-time').value = d.toTimeString().slice(0,5);
+  } else {
+    document.getElementById('eq-date').value = '';
+    document.getElementById('eq-time').value = '';
+  }
+
+  closeModal('modal-detail');
+  document.getElementById('modal-edit-quest').classList.add('open');
+}
+
+function selectEditXP(el, val) {
+  editXP = val;
+  document.querySelectorAll('#eq-xp-chips .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectEditProject(el, name) {
+  editProject = name;
+  document.getElementById('eq-projects').querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+async function saveEditQuest() {
+  const title = document.getElementById('eq-title').value.trim();
+  if (!title) { document.getElementById('eq-title').focus(); return; }
+
+  const desc = document.getElementById('eq-desc').value.trim();
+  const dateVal = document.getElementById('eq-date').value;
+  const timeVal = document.getElementById('eq-time').value;
+  let deadline = null;
+  if (dateVal && timeVal) deadline = new Date(dateVal + 'T' + timeVal).toISOString();
+  else if (dateVal) deadline = new Date(dateVal + 'T12:00').toISOString();
+
+  const btn = document.querySelector('#modal-edit-quest .submit-btn');
+  btn.textContent = 'Сохраняю...'; btn.disabled = true;
+
+  await api('quests?id=eq.' + currentDetailId, {
+    method: 'PATCH',
+    body: JSON.stringify({ title, description: desc || null, project: editProject, xp_reward: editXP, deadline })
+  });
+
+  const q = ALL_QUESTS.find(q => q.id === currentDetailId);
+  if (q) { q.title = title; q.description = desc || null; q.project = editProject; q.xp_reward = editXP; q.deadline = deadline; }
+
+  btn.textContent = 'Сохранить изменения'; btn.disabled = false;
+  closeModal('modal-edit-quest');
+  renderQuests();
+  renderKanban();
+  renderCalendarDays();
+}
+
+function confirmDelete() {
+  const q = ALL_QUESTS.find(q => q.id === currentDetailId);
+  if (!q) return;
+  if (confirm(`Удалить квест "${q.title}"?`)) {
+    deleteQuest();
+  }
+}
+
+async function deleteQuest() {
+  await api('quests?id=eq.' + currentDetailId, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } });
+  ALL_QUESTS = ALL_QUESTS.filter(q => q.id !== currentDetailId);
+  closeModal('modal-detail');
+  renderQuests();
+  renderKanban();
+  renderHistory();
+  renderCalendarDays();
+}
   const val = document.getElementById('edit-desc-input').value.trim();
   await api('quests?id=eq.' + currentDetailId, { method: 'PATCH', body: JSON.stringify({ description: val }) });
   const q = ALL_QUESTS.find(q => q.id === currentDetailId);
