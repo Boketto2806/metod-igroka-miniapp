@@ -230,6 +230,36 @@ textarea.form-input { resize: none; min-height: 80px; }
 .achieve-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--amber-soft); border: 1px solid var(--amber); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
 .achieve-title { font-size: 14px; font-weight: 600; color: var(--text); }
 .achieve-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* Projects accordion */
+.project-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 8px; }
+.project-header { padding: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s; }
+.project-header:active { background: var(--surface2); }
+.project-icon { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.project-info { flex: 1; min-width: 0; }
+.project-name { font-size: 15px; font-weight: 600; color: var(--text); }
+.project-meta { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+.project-chevron { font-size: 12px; color: var(--text-muted); transition: transform 0.25s; flex-shrink: 0; }
+.project-item.open .project-chevron { transform: rotate(180deg); }
+.project-stats { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.project-stat-badge { font-size: 10px; padding: 2px 8px; border-radius: 8px; font-weight: 600; }
+.psb-active { background: var(--accent-soft); color: var(--accent-text); }
+.psb-done { background: var(--green-soft); color: var(--green); }
+.psb-failed { background: var(--red-soft); color: var(--red); }
+.psb-postponed { background: var(--blue-soft); color: var(--blue); }
+.psb-xp { background: var(--amber-soft); color: var(--amber); }
+.project-body { max-height: 0; overflow: hidden; transition: max-height 0.3s cubic-bezier(.4,0,.2,1); }
+.project-item.open .project-body { max-height: 2000px; }
+.project-body-inner { padding: 0 14px 14px; border-top: 1px solid var(--border); }
+.project-section { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin: 12px 0 8px; }
+.project-quest { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--radius-sm); margin-bottom: 6px; cursor: pointer; transition: opacity 0.15s; }
+.project-quest:active { opacity: 0.7; }
+.project-quest.pq-active { background: var(--accent-soft); border-left: 3px solid var(--accent); }
+.project-quest.pq-done { background: rgba(0,229,176,0.07); border-left: 3px solid var(--green); opacity: 0.7; }
+.project-quest.pq-failed { background: rgba(255,79,107,0.07); border-left: 3px solid var(--red); opacity: 0.7; }
+.project-quest.pq-postponed { background: var(--blue-soft); border-left: 3px solid var(--blue); opacity: 0.7; }
+.project-quest-title { font-size: 13px; color: var(--text); flex: 1; }
+.project-quest-xp { font-size: 11px; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -324,7 +354,7 @@ textarea.form-input { resize: none; min-height: 80px; }
     </div>
   </div>
 
-  <!-- PAGE: STATS -->
+  <!-- PAGE: STATS (с ачивками) -->
   <div class="page" id="page-stats">
     <div class="page-content">
       <div class="stats-grid">
@@ -344,6 +374,12 @@ textarea.form-input { resize: none; min-height: 80px; }
           <div class="legend" id="donut-legend"></div>
         </div>
       </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">🏆 Достижения</span></div>
+        <div class="card-body" id="achieve-list">
+          <div class="empty"><div class="empty-icon">🏆</div>Достижений пока нет</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -359,14 +395,15 @@ textarea.form-input { resize: none; min-height: 80px; }
     </div>
   </div>
 
-  <!-- PAGE: ACHIEVEMENTS -->
-  <div class="page" id="page-achieve">
+  <!-- PAGE: PROJECTS -->
+  <div class="page" id="page-projects">
     <div class="page-content">
-      <div class="card">
-        <div class="card-header"><span class="card-title">Достижения</span></div>
-        <div class="card-body" id="achieve-list">
-          <div class="empty"><div class="empty-icon">🏆</div>Достижений пока нет</div>
-        </div>
+      <button class="add-btn" onclick="openAddProjectModal()">
+        <div class="add-btn-icon">+</div>
+        Создать проект
+      </button>
+      <div id="projects-list">
+        <div class="empty"><div class="empty-icon">📁</div>Проектов пока нет</div>
       </div>
     </div>
   </div>
@@ -379,14 +416,14 @@ textarea.form-input { resize: none; min-height: 80px; }
     <div class="tab" onclick="showTab('kanban',this)">
       <div class="tab-icon">📋</div><div class="tab-label">Доска</div>
     </div>
-    <div class="tab" onclick="showTab('stats',this)">
-      <div class="tab-icon">📊</div><div class="tab-label">Статы</div>
+    <div class="tab" onclick="showTab('projects',this)">
+      <div class="tab-icon">📁</div><div class="tab-label">Проекты</div>
     </div>
     <div class="tab" onclick="showTab('history',this)">
       <div class="tab-icon">📜</div><div class="tab-label">История</div>
     </div>
-    <div class="tab" onclick="showTab('achieve',this)">
-      <div class="tab-icon">🏆</div><div class="tab-label">Ачивки</div>
+    <div class="tab" onclick="showTab('stats',this)">
+      <div class="tab-icon">📊</div><div class="tab-label">Статы</div>
     </div>
   </div>
 </div>
@@ -514,6 +551,32 @@ textarea.form-input { resize: none; min-height: 80px; }
   </div>
 </div>
 
+<!-- ADD PROJECT MODAL -->
+<div class="modal-overlay" id="modal-add-project" onclick="closeModalIfOutside(event,'modal-add-project')">
+  <div class="modal-sheet">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px 4px">
+      <div class="modal-title" style="padding:0">Новый проект</div>
+      <button onclick="closeModal('modal-add-project')" style="width:30px;height:30px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Название</label>
+      <input class="form-input" id="p-title" type="text" placeholder="Название проекта">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Описание (необязательно)</label>
+      <textarea class="form-input" id="p-desc" placeholder="О чём этот проект..." style="min-height:80px"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Дедлайн проекта (необязательно)</label>
+      <div class="form-row">
+        <input class="form-input" id="p-date" type="date">
+        <input class="form-input" id="p-time" type="time">
+      </div>
+    </div>
+    <button class="submit-btn" onclick="submitProject()">Создать проект</button>
+  </div>
+</div>
+
 <div class="xp-popup" id="popup"></div>
 
 <script>
@@ -548,6 +611,7 @@ function showTab(name, el) {
   el.classList.add('active');
   if (name === 'stats') renderStats();
   if (name === 'kanban') renderKanban();
+  if (name === 'projects') renderProjects();
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
@@ -773,7 +837,119 @@ function editDesc() {
   document.getElementById('modal-edit-desc').classList.add('open');
 }
 
-let editXP = 100;
+let openProjectId = null;
+
+function renderProjects() {
+  const el = document.getElementById('projects-list');
+  if (!PROJECTS.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📁</div>Проектов пока нет</div>';
+    return;
+  }
+  el.innerHTML = PROJECTS.map(p => {
+    const quests = ALL_QUESTS.filter(q => q.project === p.name);
+    const active = quests.filter(q => q.board_status === 'active' || (!q.board_status && q.status === 'active'));
+    const done = quests.filter(q => q.board_status === 'completed' || q.status === 'completed');
+    const failed = quests.filter(q => q.board_status === 'failed');
+    const postponed = quests.filter(q => q.board_status === 'postponed');
+    const totalXp = done.reduce((s, q) => s + (q.xp_reward || 0), 0);
+    const dl = p.deadline ? new Date(p.deadline).toLocaleDateString('ru', {day:'numeric', month:'short', year:'numeric'}) : null;
+    const isOpen = openProjectId === p.id;
+
+    return `<div class="project-item${isOpen?' open':''}" id="proj-${p.id}">
+      <div class="project-header" onclick="toggleProject(${p.id})">
+        <div class="project-icon">📁</div>
+        <div class="project-info">
+          <div class="project-name">${p.name}</div>
+          ${p.description ? `<div class="project-meta">${p.description}</div>` : ''}
+          ${dl ? `<div class="project-meta">⏰ до ${dl}</div>` : ''}
+          <div class="project-stats">
+            ${active.length ? `<span class="project-stat-badge psb-active">⚔️ ${active.length}</span>` : ''}
+            ${done.length ? `<span class="project-stat-badge psb-done">✅ ${done.length}</span>` : ''}
+            ${failed.length ? `<span class="project-stat-badge psb-failed">💀 ${failed.length}</span>` : ''}
+            ${postponed.length ? `<span class="project-stat-badge psb-postponed">⏸ ${postponed.length}</span>` : ''}
+            ${totalXp ? `<span class="project-stat-badge psb-xp">+${totalXp} XP</span>` : ''}
+          </div>
+        </div>
+        <div class="project-chevron">▼</div>
+      </div>
+      <div class="project-body">
+        <div class="project-body-inner">
+          ${active.length ? `
+            <div class="project-section">⚔️ В работе (${active.length})</div>
+            ${active.map(q => projectQuestHTML(q, 'pq-active')).join('')}
+          ` : ''}
+          ${done.length ? `
+            <div class="project-section">✅ Завершено (${done.length})</div>
+            ${done.map(q => projectQuestHTML(q, 'pq-done')).join('')}
+          ` : ''}
+          ${failed.length ? `
+            <div class="project-section">💀 Провалено (${failed.length})</div>
+            ${failed.map(q => projectQuestHTML(q, 'pq-failed')).join('')}
+          ` : ''}
+          ${postponed.length ? `
+            <div class="project-section">⏸ Отложено (${postponed.length})</div>
+            ${postponed.map(q => projectQuestHTML(q, 'pq-postponed')).join('')}
+          ` : ''}
+          ${!quests.length ? '<div style="font-size:13px;color:var(--text-muted);padding:8px 0">Квестов пока нет</div>' : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function projectQuestHTML(q, cls) {
+  const xpColor = cls === 'pq-done' ? 'var(--green)' : cls === 'pq-failed' ? 'var(--red)' : 'var(--amber)';
+  const xpText = cls === 'pq-failed' ? `-${Math.floor(q.xp_reward/2)}` : `+${q.xp_reward}`;
+  return `<div class="project-quest ${cls}" onclick="openDetail(${q.id})">
+    <div class="project-quest-title">${q.title}</div>
+    <div class="project-quest-xp" style="color:${xpColor}">${xpText} XP</div>
+  </div>`;
+}
+
+function toggleProject(id) {
+  if (openProjectId === id) {
+    openProjectId = null;
+  } else {
+    openProjectId = id;
+  }
+  renderProjects();
+}
+
+function openAddProjectModal() {
+  document.getElementById('p-title').value = '';
+  document.getElementById('p-desc').value = '';
+  document.getElementById('p-date').value = '';
+  document.getElementById('p-time').value = '';
+  document.getElementById('modal-add-project').classList.add('open');
+  setTimeout(() => document.getElementById('p-title').focus(), 300);
+}
+
+async function submitProject() {
+  const title = document.getElementById('p-title').value.trim();
+  if (!title) { document.getElementById('p-title').focus(); return; }
+  const desc = document.getElementById('p-desc').value.trim();
+  const dateVal = document.getElementById('p-date').value;
+  const timeVal = document.getElementById('p-time').value;
+  let deadline = null;
+  if (dateVal && timeVal) deadline = new Date(dateVal + 'T' + timeVal).toISOString();
+  else if (dateVal) deadline = new Date(dateVal + 'T23:59').toISOString();
+
+  const btn = document.querySelector('#modal-add-project .submit-btn');
+  btn.textContent = 'Создаю...'; btn.disabled = true;
+
+  const result = await api('projects', {
+    method: 'POST',
+    body: JSON.stringify({ player_id: PLAYER.id, name: title, description: desc || null, deadline })
+  });
+
+  if (result && result[0]) {
+    PROJECTS.push(result[0]);
+    renderProjects();
+  }
+
+  btn.textContent = 'Создать проект'; btn.disabled = false;
+  closeModal('modal-add-project');
+}
 let editProject = null;
 
 function openEditQuest() {
