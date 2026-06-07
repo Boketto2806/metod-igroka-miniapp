@@ -1253,12 +1253,14 @@ function renderCalendarQuests(deadlineMap){
     let icon = isDone ? '✅ ' : isFailed ? '💀 ' : '';
     let titleStyle = isDone ? 'text-decoration:line-through;color:var(--text-muted)' : isFailed ? 'text-decoration:line-through;color:var(--red);opacity:0.7' : '';
     let opacity = (isDone || isFailed) ? 'opacity:0.7' : '';
+    let xpDisplay = isDone ? `+${q.xp_reward} XP` : isFailed ? `-${Math.floor(q.xp_reward/2)} XP` : `+${q.xp_reward} XP`;
+    let xpColor = isDone ? 'var(--green)' : isFailed ? 'var(--red)' : 'var(--amber)';
     return `<div class="cal-quest-item" onclick="openDetail(${q.id})" style="border-left-color:${borderColor};background:${bgColor};${opacity}">
       <div style="flex:1">
         <div class="cal-quest-name" style="${titleStyle}">${icon}${q.title}</div>
         <span class="quest-proj" style="font-size:10px">${q.project||'Общее'}</span>
       </div>
-      <div style="text-align:right"><div class="cal-quest-xp">+${q.xp_reward} XP</div><div class="cal-quest-time">${time}</div></div>
+      <div style="text-align:right"><div class="cal-quest-xp" style="color:${xpColor}">${xpDisplay}</div><div class="cal-quest-time">${time}</div></div>
     </div>`;
   }).join('');
 }
