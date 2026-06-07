@@ -8,26 +8,28 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 :root {
-  --bg: #0a0a0f;
-  --surface: #13131a;
-  --surface2: #1a1a24;
-  --border: #252535;
-  --accent: #6c5ce7;
-  --accent-soft: #2d2750;
-  --accent-text: #b8b0ff;
-  --green: #00cfa8;
-  --green-soft: #003d32;
-  --amber: #f0a500;
-  --amber-soft: #3d2800;
-  --red: #ff5f5f;
-  --red-soft: #3d0000;
-  --blue: #3b82f6;
-  --blue-soft: #1e3a5f;
-  --text: #e0e0f0;
-  --text-muted: #5a5a7a;
-  --text-dim: #8888aa;
-  --radius: 14px;
-  --radius-sm: 8px;
+  --bg: #080810;
+  --surface: #0f0f1a;
+  --surface2: #16162a;
+  --border: #1e1e35;
+  --accent: #7c6ff7;
+  --accent-soft: #251f5a;
+  --accent-text: #c4bfff;
+  --green: #00e5b0;
+  --green-soft: #003d2e;
+  --amber: #ffb800;
+  --amber-soft: #3d2d00;
+  --red: #ff4f6b;
+  --red-soft: #3d0010;
+  --blue: #3b9eff;
+  --blue-soft: #0d2a4a;
+  --pink: #f472b6;
+  --pink-soft: #3d0f2a;
+  --text: #eeeeff;
+  --text-muted: #4a4a6a;
+  --text-dim: #7878aa;
+  --radius: 16px;
+  --radius-sm: 10px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; overflow: hidden; }
@@ -38,74 +40,91 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
 .page.active { display: block; }
 .page-content { padding: 12px 14px 80px; display: flex; flex-direction: column; gap: 12px; }
 
-/* Header */
-.header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 14px; flex-shrink: 0; }
+/* Header — тёмный с лёгким градиентом */
+.header { background: linear-gradient(180deg, #12102a 0%, #0f0f1a 100%); border-bottom: 1px solid #2a2a45; padding: 12px 14px; flex-shrink: 0; }
 .header-top { display: flex; align-items: center; gap: 10px; }
-.avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #a855f7); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0; box-shadow: 0 0 12px rgba(124,111,247,0.4); }
 .header-info { flex: 1; min-width: 0; }
 .header-name { font-size: 15px; font-weight: 600; color: var(--text); }
 .header-level { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
-.streak-badge { background: var(--amber-soft); border: 1px solid var(--amber); border-radius: 20px; padding: 5px 10px; font-size: 12px; color: var(--amber); font-weight: 600; flex-shrink: 0; }
-.xp-bar-wrap { margin-top: 10px; }
-.xp-bar-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; }
-.xp-bar-labels span:last-child { color: var(--accent-text); }
-.xp-track { background: var(--surface2); border-radius: 4px; height: 6px; }
-.xp-fill { background: linear-gradient(90deg, var(--accent), #a855f7); border-radius: 4px; height: 100%; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+.streak-badge { background: var(--amber-soft); border: 1px solid var(--amber); border-radius: 20px; padding: 5px 10px; font-size: 12px; color: var(--amber); font-weight: 600; flex-shrink: 0; box-shadow: 0 0 8px rgba(255,184,0,0.2); }
 
-/* Cards */
+/* XP Bar — золотой с черточками */
+.xp-bar-wrap { margin-top: 10px; }
+.xp-bar-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+.xp-bar-labels span:nth-child(2) { color: var(--amber); font-weight: 600; }
+.xp-segments { display: flex; gap: 3px; height: 8px; }
+.xp-seg { flex: 1; border-radius: 3px; background: var(--surface2); border: 1px solid var(--border); transition: background 0.4s, box-shadow 0.4s; }
+.xp-seg.filled { background: linear-gradient(90deg, var(--amber), #ffdd57); border-color: var(--amber); box-shadow: 0 0 4px rgba(255,184,0,0.4); }
+.xp-seg.partial { background: linear-gradient(90deg, var(--amber), #ffdd57); border-color: var(--amber); opacity: 0.4; }
+
+/* Cards — каждый с акцентом своего цвета */
 .card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
 .card-header { padding: 12px 14px 0; display: flex; align-items: center; justify-content: space-between; }
 .card-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; }
 .card-body { padding: 12px 14px; }
 
+/* Квесты — фиолетовый акцент */
+.card-quests { background: linear-gradient(180deg, #14103a 0%, var(--surface) 60%); border-color: #2a2460; }
+.card-quests .card-title { color: var(--accent-text); }
+
+/* Календарь — синий акцент */
+.card-calendar { background: linear-gradient(180deg, #0d1f3a 0%, var(--surface) 60%); border-color: #1a3a5a; }
+.card-calendar .card-title { color: var(--blue); }
+
 /* Add button */
 .add-btn { display: flex; align-items: center; gap: 8px; background: var(--accent-soft); border: 1px dashed var(--accent); border-radius: var(--radius-sm); padding: 11px 14px; color: var(--accent-text); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; width: 100%; }
 .add-btn:active { opacity: 0.7; transform: scale(0.98); }
-.add-btn-icon { width: 20px; height: 20px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; flex-shrink: 0; }
+.add-btn-icon { width: 20px; height: 20px; background: linear-gradient(135deg, var(--accent), var(--pink)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; flex-shrink: 0; }
 
 /* Quest items */
 .quest-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: opacity 0.15s; }
 .quest-item:last-child { border-bottom: none; padding-bottom: 0; }
 .quest-item:first-child { padding-top: 0; }
 .quest-item:active { opacity: 0.6; }
-.quest-cb { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px; transition: all 0.2s; font-size: 11px; }
+.quest-cb { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid #2a2a45; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px; transition: all 0.2s; font-size: 11px; }
 .quest-cb.done { background: var(--accent); border-color: var(--accent); color: #fff; }
 .quest-body { flex: 1; min-width: 0; }
 .quest-title { font-size: 14px; color: var(--text); line-height: 1.4; }
 .quest-title.done { text-decoration: line-through; color: var(--text-muted); }
 .quest-meta { display: flex; align-items: center; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
 .quest-proj { font-size: 11px; color: var(--accent-text); background: var(--accent-soft); padding: 2px 8px; border-radius: 10px; }
-.quest-xp { font-size: 11px; color: var(--text-muted); }
-.quest-deadline { font-size: 11px; color: var(--amber); }
+.quest-xp { font-size: 11px; color: var(--amber); font-weight: 600; }
+.quest-deadline { font-size: 11px; color: var(--blue); }
 .quest-deadline.overdue { color: var(--red); }
 
-/* Stats */
+/* Stats — цветные карточки */
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; }
+.stat-card { border-radius: var(--radius-sm); padding: 12px; border: 1px solid; }
+.stat-card.sc-xp { background: linear-gradient(135deg, #1a1040, #0f0f1a); border-color: #3a2a80; }
+.stat-card.sc-quests { background: linear-gradient(135deg, #003d2e, #0f0f1a); border-color: #006a50; }
+.stat-card.sc-streak { background: linear-gradient(135deg, #3d2d00, #0f0f1a); border-color: #6a4a00; }
+.stat-card.sc-best { background: linear-gradient(135deg, #0d1f3a, #0f0f1a); border-color: #1a3a6a; }
 .stat-val { font-size: 24px; font-weight: 700; line-height: 1; }
 .stat-lbl { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 .purple { color: var(--accent-text); }
 .green { color: var(--green); }
 .amber { color: var(--amber); }
+.blue-text { color: var(--blue); }
 
 /* Calendar */
 .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.cal-nav-btn { width: 30px; height: 30px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.cal-month { font-size: 14px; font-weight: 600; color: var(--text); }
+.cal-nav-btn { width: 30px; height: 30px; border-radius: 50%; background: var(--blue-soft); border: 1px solid var(--blue); color: var(--blue); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.cal-month { font-size: 14px; font-weight: 600; color: var(--blue); }
 .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
 .cal-dow { text-align: center; font-size: 10px; color: var(--text-muted); font-weight: 600; padding: 4px 0; }
 .cal-day { aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; color: var(--text-dim); position: relative; transition: all 0.15s; }
 .cal-day.other-month { opacity: 0.3; }
-.cal-day.today { background: var(--accent-soft); color: var(--accent-text); font-weight: 700; border: 1px solid var(--accent); }
-.cal-day.selected { background: var(--accent); color: #fff; font-weight: 700; }
+.cal-day.today { background: var(--blue-soft); color: var(--blue); font-weight: 700; border: 1px solid var(--blue); }
+.cal-day.selected { background: var(--blue); color: #fff; font-weight: 700; }
 .cal-day.has-quests::after { content: ''; position: absolute; bottom: 3px; width: 4px; height: 4px; border-radius: 50%; background: var(--green); }
 .cal-day.today.has-quests::after, .cal-day.selected.has-quests::after { background: #fff; }
 .cal-selected-quests { margin-top: 12px; }
-.cal-selected-title { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
-.cal-quest-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--surface2); border-radius: var(--radius-sm); margin-bottom: 6px; border-left: 3px solid var(--accent); cursor: pointer; }
+.cal-selected-title { font-size: 12px; color: var(--blue); margin-bottom: 8px; font-weight: 600; }
+.cal-quest-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--blue-soft); border-radius: var(--radius-sm); margin-bottom: 6px; border-left: 3px solid var(--blue); cursor: pointer; }
 .cal-quest-item.done-item { border-left-color: var(--green); opacity: 0.6; }
 .cal-quest-name { font-size: 13px; color: var(--text); flex: 1; }
-.cal-quest-xp { font-size: 11px; color: var(--accent-text); }
+.cal-quest-xp { font-size: 11px; color: var(--amber); font-weight: 600; }
 .cal-quest-time { font-size: 11px; color: var(--text-muted); }
 
 /* Charts */
@@ -232,7 +251,7 @@ textarea.form-input { resize: none; min-height: 80px; }
         <span id="xpval">0 / 100 XP</span>
         <span id="lvl-next">Ур. 2</span>
       </div>
-      <div class="xp-track"><div class="xp-fill" id="xpbar" style="width:0%"></div></div>
+      <div class="xp-segments" id="xp-segments"></div>
     </div>
   </div>
 
@@ -243,16 +262,16 @@ textarea.form-input { resize: none; min-height: 80px; }
         <div class="add-btn-icon">+</div>
         Добавить квест
       </button>
-      <div class="card">
+      <div class="card card-quests">
         <div class="card-header">
           <span class="card-title">Активные квесты</span>
-          <span id="active-count" style="font-size:12px;color:var(--text-muted)">0</span>
+          <span id="active-count" style="font-size:12px;color:var(--accent-text)">0</span>
         </div>
         <div class="card-body" id="quest-list">
           <div class="empty"><div class="empty-icon">⚔️</div>Квестов пока нет</div>
         </div>
       </div>
-      <div class="card">
+      <div class="card card-calendar">
         <div class="card-header"><span class="card-title">Календарь</span></div>
         <div class="card-body">
           <div class="cal-nav">
@@ -306,10 +325,10 @@ textarea.form-input { resize: none; min-height: 80px; }
   <div class="page" id="page-stats">
     <div class="page-content">
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-val purple" id="s-xp">0</div><div class="stat-lbl">Всего XP</div></div>
-        <div class="stat-card"><div class="stat-val green" id="s-quests">0</div><div class="stat-lbl">Квестов закрыто</div></div>
-        <div class="stat-card"><div class="stat-val amber" id="s-streak">0</div><div class="stat-lbl">Текущий streak</div></div>
-        <div class="stat-card"><div class="stat-val" id="s-best">0</div><div class="stat-lbl">Лучший streak</div></div>
+        <div class="stat-card sc-xp"><div class="stat-val purple" id="s-xp">0</div><div class="stat-lbl">Всего XP</div></div>
+        <div class="stat-card sc-quests"><div class="stat-val green" id="s-quests">0</div><div class="stat-lbl">Квестов закрыто</div></div>
+        <div class="stat-card sc-streak"><div class="stat-val amber" id="s-streak">0</div><div class="stat-lbl">Текущий streak</div></div>
+        <div class="stat-card sc-best"><div class="stat-val blue-text" id="s-best">0</div><div class="stat-lbl">Лучший streak</div></div>
       </div>
       <div class="charts-col">
         <div class="chart-card">
@@ -556,10 +575,19 @@ function renderHeader() {
   document.getElementById('ulevel').textContent = 'Уровень ' + PLAYER.level;
   document.getElementById('streak').textContent = '🔥 ' + PLAYER.streak + ' дней';
   document.getElementById('xpval').textContent = PLAYER.xp + ' / ' + PLAYER.xp_to_next + ' XP';
-  const pct = Math.round(PLAYER.xp / PLAYER.xp_to_next * 100);
-  document.getElementById('xpbar').style.width = pct + '%';
   document.getElementById('lvl-cur').textContent = 'Ур. ' + PLAYER.level;
   document.getElementById('lvl-next').textContent = 'Ур. ' + (PLAYER.level + 1);
+
+  // XP сегменты — 1 сегмент = 10 XP, всего xp_to_next/10 сегментов
+  const totalSegs = Math.round(PLAYER.xp_to_next / 10);
+  const filledSegs = Math.floor(PLAYER.xp / 10);
+  const segEl = document.getElementById('xp-segments');
+  let html = '';
+  for (let i = 0; i < totalSegs; i++) {
+    if (i < filledSegs) html += `<div class="xp-seg filled"></div>`;
+    else html += `<div class="xp-seg"></div>`;
+  }
+  segEl.innerHTML = html;
 }
 
 // ── Quests ────────────────────────────────────────────────────────────────────
