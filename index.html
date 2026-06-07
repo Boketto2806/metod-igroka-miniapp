@@ -1247,11 +1247,15 @@ function renderCalendarQuests(deadlineMap){
   el.innerHTML+=quests.map(q=>{
     const time=new Date(q.deadline).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
     const isDone = q.board_status==='completed'||q.status==='completed';
-    return `<div class="cal-quest-item${isDone?' done-item':''}" onclick="openDetail(${q.id})" style="${isDone?'opacity:0.5':''}">
+    const isFailed = q.board_status==='failed';
+    let borderColor = isDone ? 'var(--green)' : isFailed ? 'var(--red)' : 'var(--blue)';
+    let bgColor = isDone ? 'rgba(0,229,176,0.08)' : isFailed ? 'rgba(255,79,107,0.08)' : 'var(--blue-soft)';
+    let icon = isDone ? '✅ ' : isFailed ? '💀 ' : '';
+    let titleStyle = isDone ? 'text-decoration:line-through;color:var(--text-muted)' : isFailed ? 'text-decoration:line-through;color:var(--red);opacity:0.7' : '';
+    let opacity = (isDone || isFailed) ? 'opacity:0.7' : '';
+    return `<div class="cal-quest-item" onclick="openDetail(${q.id})" style="border-left-color:${borderColor};background:${bgColor};${opacity}">
       <div style="flex:1">
-        <div class="cal-quest-name" style="${isDone?'text-decoration:line-through;color:var(--text-muted)':''}">
-          ${isDone?'✅ ':''}${q.title}
-        </div>
+        <div class="cal-quest-name" style="${titleStyle}">${icon}${q.title}</div>
         <span class="quest-proj" style="font-size:10px">${q.project||'Общее'}</span>
       </div>
       <div style="text-align:right"><div class="cal-quest-xp">+${q.xp_reward} XP</div><div class="cal-quest-time">${time}</div></div>
