@@ -372,8 +372,10 @@ textarea.form-input { resize: none; min-height: 80px; }
 <!-- ADD QUEST MODAL -->
 <div class="modal-overlay" id="modal-add" onclick="closeModalIfOutside(event,'modal-add')">
   <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Новый квест</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px 4px">
+      <div class="modal-title" style="padding:0">Новый квест</div>
+      <button onclick="closeModal('modal-add')" style="width:30px;height:30px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+    </div>
     <div class="form-group">
       <label class="form-label">Название</label>
       <input class="form-input" id="f-title" type="text" placeholder="Что нужно сделать?">
@@ -409,9 +411,7 @@ textarea.form-input { resize: none; min-height: 80px; }
 <!-- QUEST DETAIL MODAL -->
 <div class="modal-overlay" id="modal-detail" onclick="closeModalIfOutside(event,'modal-detail')">
   <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 16px 4px">
-      <div></div>
+    <div style="display:flex;align-items:center;justify-content:flex-end;padding:12px 16px 4px">
       <button onclick="closeModal('modal-detail')" style="width:30px;height:30px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
     </div>
     <div class="detail-header">
@@ -442,8 +442,10 @@ textarea.form-input { resize: none; min-height: 80px; }
 <!-- EDIT DESC MODAL -->
 <div class="modal-overlay" id="modal-edit-desc" onclick="closeModalIfOutside(event,'modal-edit-desc')">
   <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Описание</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px 4px">
+      <div class="modal-title" style="padding:0">Описание</div>
+      <button onclick="closeModal('modal-edit-desc')" style="width:30px;height:30px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+    </div>
     <div class="form-group">
       <textarea class="form-input" id="edit-desc-input" placeholder="Детали, заметки..." style="min-height:120px"></textarea>
     </div>
@@ -454,8 +456,10 @@ textarea.form-input { resize: none; min-height: 80px; }
 <!-- EDIT QUEST MODAL -->
 <div class="modal-overlay" id="modal-edit-quest" onclick="closeModalIfOutside(event,'modal-edit-quest')">
   <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Редактировать квест</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px 4px">
+      <div class="modal-title" style="padding:0">Редактировать квест</div>
+      <button onclick="closeModal('modal-edit-quest')" style="width:30px;height:30px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+    </div>
     <div class="form-group">
       <label class="form-label">Название</label>
       <input class="form-input" id="eq-title" type="text">
