@@ -832,7 +832,8 @@ async function deleteQuest() {
   renderHistory();
   renderCalendarDays();
 }
-  const val = document.getElementById('edit-desc-input').value.trim();
+
+async function saveDesc() {
   await api('quests?id=eq.' + currentDetailId, { method: 'PATCH', body: JSON.stringify({ description: val }) });
   const q = ALL_QUESTS.find(q => q.id === currentDetailId);
   if (q) q.description = val;
