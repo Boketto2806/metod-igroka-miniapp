@@ -220,6 +220,31 @@ textarea.form-input { resize: none; min-height: 80px; }
 .xp-popup { position: fixed; top: 30%; left: 50%; transform: translate(-50%,-50%) scale(0); background: var(--accent); color: #fff; padding: 12px 28px; border-radius: 12px; font-size: 18px; font-weight: 700; transition: all 0.25s cubic-bezier(.4,0,.2,1); z-index: 200; pointer-events: none; }
 .xp-popup.show { transform: translate(-50%,-50%) scale(1); }
 
+/* Toast notifications */
+.toast-container { position: fixed; bottom: 80px; left: 14px; right: 14px; z-index: 300; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast { border-radius: var(--radius-sm); padding: 12px 14px; display: flex; align-items: center; gap: 10px; transform: translateY(20px); opacity: 0; transition: all 0.3s cubic-bezier(.4,0,.2,1); pointer-events: none; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.toast-success { background: rgba(0,229,176,0.15); border: 1px solid var(--green); }
+.toast.toast-fail { background: rgba(255,79,107,0.15); border: 1px solid var(--red); }
+.toast.toast-levelup { background: rgba(124,111,247,0.2); border: 1px solid var(--accent); }
+.toast.toast-leveldown { background: rgba(255,79,107,0.2); border: 1px solid var(--red); }
+.toast-icon { font-size: 20px; flex-shrink: 0; }
+.toast-body { flex: 1; }
+.toast-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.toast-sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.toast-xp { font-size: 14px; font-weight: 700; flex-shrink: 0; }
+
+/* Level up overlay */
+.levelup-overlay { position: fixed; inset: 0; z-index: 500; display: flex; align-items: center; justify-content: center; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+.levelup-overlay.show { opacity: 1; }
+.levelup-overlay.levelup { background: radial-gradient(circle, rgba(124,111,247,0.4) 0%, rgba(0,0,0,0.8) 70%); }
+.levelup-overlay.leveldown { background: radial-gradient(circle, rgba(255,79,107,0.4) 0%, rgba(0,0,0,0.8) 70%); }
+.levelup-content { text-align: center; transform: scale(0.5); transition: transform 0.4s cubic-bezier(.4,0,.2,1); }
+.levelup-overlay.show .levelup-content { transform: scale(1); }
+.levelup-emoji { font-size: 64px; margin-bottom: 12px; }
+.levelup-text { font-size: 32px; font-weight: 800; color: #fff; text-shadow: 0 0 30px currentColor; }
+.levelup-sub { font-size: 16px; color: rgba(255,255,255,0.7); margin-top: 8px; }
+
 .empty { text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 13px; }
 .empty-icon { font-size: 28px; margin-bottom: 8px; }
 .history-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
@@ -577,6 +602,16 @@ textarea.form-input { resize: none; min-height: 80px; }
   </div>
 </div>
 
+<div class="toast-container" id="toast-container"></div>
+
+<div class="levelup-overlay" id="levelup-overlay">
+  <div class="levelup-content">
+    <div class="levelup-emoji" id="levelup-emoji">🎉</div>
+    <div class="levelup-text" id="levelup-text">УРОВЕНЬ 2!</div>
+    <div class="levelup-sub" id="levelup-sub">Поздравляем!</div>
+  </div>
+</div>
+
 <div class="xp-popup" id="popup"></div>
 
 <script>
@@ -601,6 +636,84 @@ async function api(path, opts = {}) {
   });
   if (res.status === 204) return null;
   return res.json();
+}
+
+// ── Toasts & Animations ───────────────────────────────────────────────────────
+
+function showToast(type, icon, title, sub, xpDelta) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  const xpColor = xpDelta > 0 ? 'var(--green)' : 'var(--red)';
+  const xpText = xpDelta > 0 ? `+${xpDelta} XP` : `${xpDelta} XP`;
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `
+    <div class="toast-icon">${icon}</div>
+    <div class="toast-body">
+      <div class="toast-title">${title}</div>
+      ${sub ? `<div class="toast-sub">${sub}</div>` : ''}
+    </div>
+    ${xpDelta !== 0 ? `<div class="toast-xp" style="color:${xpColor}">${xpText}</div>` : ''}
+  `;
+  container.appendChild(toast);
+  requestAnimationFrame(() => { requestAnimationFrame(() => toast.classList.add('show')); });
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 400);
+  }, 3500);
+}
+
+function showLevelAnimation(isUp, newLevel) {
+  const overlay = document.getElementById('levelup-overlay');
+  overlay.className = `levelup-overlay ${isUp ? 'levelup' : 'leveldown'}`;
+  document.getElementById('levelup-emoji').textContent = isUp ? '🎉' : '💔';
+  document.getElementById('levelup-text').textContent = isUp ? `УРОВЕНЬ ${newLevel}!` : `УРОВЕНЬ ${newLevel}`;
+  document.getElementById('levelup-sub').textContent = isUp ? 'Ты становишься сильнее!' : 'Не сдавайся, продолжай!';
+  document.getElementById('levelup-text').style.color = isUp ? 'var(--accent-text)' : 'var(--red)';
+  overlay.classList.add('show');
+  setTimeout(() => overlay.classList.remove('show'), 2500);
+}
+
+async function loadNotifications() {
+  if (!PLAYER) return;
+  try {
+    const notifs = await api(`notifications?player_id=eq.${PLAYER.id}&seen=eq.false&order=created_at.asc`);
+    if (notifs && notifs.length) {
+      await api(`notifications?player_id=eq.${PLAYER.id}&seen=eq.false`, {
+        method: 'PATCH',
+        body: JSON.stringify({ seen: true })
+      });
+      for (let i = 0; i < notifs.length; i++) {
+        const n = notifs[i];
+        await new Promise(resolve => setTimeout(resolve, i * 800));
+        if (n.type === 'level_up') {
+          const lvl = parseInt(n.message.match(/\d+/) || [2]);
+          showLevelAnimation(true, lvl);
+          showToast('levelup', '🎉', n.message, null, n.xp_delta);
+        } else if (n.type === 'level_down') {
+          showLevelAnimation(false, PLAYER.level);
+          showToast('leveldown', '💔', 'Уровень понижен', n.message, n.xp_delta);
+        } else if (n.type === 'quest_completed') {
+          showToast('success', '✅', n.message, null, n.xp_delta);
+        } else if (n.type === 'quest_failed') {
+          showToast('fail', '💀', n.message, 'Квест провален', n.xp_delta);
+        }
+      }
+    }
+
+    // Проверяем просроченные активные квесты
+    const now = new Date();
+    const overdue = ALL_QUESTS.filter(q => {
+      const isActive = q.board_status === 'active' || (!q.board_status && q.status === 'active');
+      return isActive && q.deadline && new Date(q.deadline) < now;
+    });
+    for (let i = 0; i < overdue.length; i++) {
+      const q = overdue[i];
+      await new Promise(resolve => setTimeout(resolve, (notifs?.length || 0) * 800 + i * 600));
+      showToast('fail', '⚠️', `Просрочен: ${q.title}`, formatDeadline(q.deadline), 0);
+    }
+  } catch(e) {
+    console.log('Notifications error:', e);
+  }
 }
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
@@ -635,6 +748,8 @@ async function load() {
   renderHistory();
   renderAchievements();
   initCalendar();
+  // Показываем уведомления через 1 секунду после загрузки
+  setTimeout(loadNotifications, 1000);
 }
 
 // ── Header ────────────────────────────────────────────────────────────────────
@@ -673,7 +788,8 @@ function renderQuests() {
   el.innerHTML = active.map(q => {
     const dl = formatDeadline(q.deadline);
     const overdue = q.deadline && new Date(q.deadline) < new Date();
-    return `<div class="quest-item" onclick="openDetail(${q.id})">
+    const overdueStyle = overdue ? 'border:1px solid var(--red);border-radius:var(--radius-sm);padding:8px;margin-bottom:2px;background:rgba(255,79,107,0.05);' : '';
+    return `<div class="quest-item" onclick="openDetail(${q.id})" style="${overdueStyle}">
       <div class="quest-cb"></div>
       <div class="quest-body">
         <div class="quest-title">${q.title}</div>
@@ -681,6 +797,7 @@ function renderQuests() {
           <span class="quest-proj">${q.project || 'Общее'}</span>
           <span class="quest-xp">+${q.xp_reward} XP</span>
           ${dl ? `<span class="quest-deadline${overdue?' overdue':''}">📅 ${dl}</span>` : ''}
+          ${overdue ? `<span style="font-size:11px;color:var(--red);font-weight:600;background:var(--red-soft);padding:2px 8px;border-radius:10px">⚠️ Просрочен</span>` : ''}
         </div>
         ${q.description ? `<div style="font-size:12px;color:var(--text-muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${q.description}</div>` : ''}
       </div>
