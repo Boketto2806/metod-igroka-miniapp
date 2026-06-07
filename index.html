@@ -272,7 +272,10 @@ textarea.form-input { resize: none; min-height: 80px; }
         </div>
       </div>
       <div class="card card-calendar">
-        <div class="card-header"><span class="card-title">Календарь</span></div>
+        <div class="card-header">
+          <span class="card-title">Календарь</span>
+          <button onclick="toggleCalCompleted()" id="cal-toggle-btn" style="font-size:11px;background:var(--blue-soft);border:1px solid var(--blue);color:var(--blue);padding:4px 10px;border-radius:20px;cursor:pointer;font-family:inherit">Скрыть завершённые</button>
+        </div>
         <div class="card-body">
           <div class="cal-nav">
             <button class="cal-nav-btn" onclick="calPrev()">‹</button>
@@ -1219,18 +1222,38 @@ function renderCalendarDays() {
   document.getElementById('cal-days').innerHTML=html;
   renderCalendarQuests(deadlineMap);
 }
+let calHideCompleted = false;
+
+function toggleCalCompleted() {
+  calHideCompleted = !calHideCompleted;
+  const btn = document.getElementById('cal-toggle-btn');
+  btn.textContent = calHideCompleted ? 'Показать завершённые' : 'Скрыть завершённые';
+  btn.style.background = calHideCompleted ? 'var(--green-soft)' : 'var(--blue-soft)';
+  btn.style.borderColor = calHideCompleted ? 'var(--green)' : 'var(--blue)';
+  btn.style.color = calHideCompleted ? 'var(--green)' : 'var(--blue)';
+  renderCalendarDays();
+}
+
 function selectCalDay(d){selectedDay=d;renderCalendarDays();}
+
 function renderCalendarQuests(deadlineMap){
   const key=`${calYear}-${calMonth}-${selectedDay}`;
-  const quests=deadlineMap[key]||[];
+  let quests=deadlineMap[key]||[];
+  if(calHideCompleted) quests=quests.filter(q=>q.board_status!=='completed'&&q.status!=='completed');
   const el=document.getElementById('cal-quests');
   const dateStr=new Date(calYear,calMonth,selectedDay).toLocaleDateString('ru',{day:'numeric',month:'long'});
   el.innerHTML=`<div class="cal-selected-title">${dateStr}</div>`;
   if(!quests.length){el.innerHTML+='<div style="font-size:13px;color:var(--text-muted)">Нет квестов</div>';return;}
   el.innerHTML+=quests.map(q=>{
     const time=new Date(q.deadline).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
-    return `<div class="cal-quest-item${q.status==='completed'?' done-item':''}" onclick="openDetail(${q.id})">
-      <div style="flex:1"><div class="cal-quest-name">${q.title}</div><span class="quest-proj" style="font-size:10px">${q.project||'Общее'}</span></div>
+    const isDone = q.board_status==='completed'||q.status==='completed';
+    return `<div class="cal-quest-item${isDone?' done-item':''}" onclick="openDetail(${q.id})" style="${isDone?'opacity:0.5':''}">
+      <div style="flex:1">
+        <div class="cal-quest-name" style="${isDone?'text-decoration:line-through;color:var(--text-muted)':''}">
+          ${isDone?'✅ ':''}${q.title}
+        </div>
+        <span class="quest-proj" style="font-size:10px">${q.project||'Общее'}</span>
+      </div>
       <div style="text-align:right"><div class="cal-quest-xp">+${q.xp_reward} XP</div><div class="cal-quest-time">${time}</div></div>
     </div>`;
   }).join('');
