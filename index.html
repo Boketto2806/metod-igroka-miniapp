@@ -78,7 +78,7 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
 .add-btn-icon { width: 20px; height: 20px; background: linear-gradient(135deg, var(--accent), var(--pink)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; flex-shrink: 0; }
 
 /* Quest items */
-.quest-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: opacity 0.15s; }
+.quest-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: opacity 0.15s; touch-action: pan-y; }
 .quest-item:last-child { border-bottom: none; padding-bottom: 0; }
 .quest-item:first-child { padding-top: 0; }
 .quest-item:active { opacity: 0.6; }
@@ -787,7 +787,8 @@ function renderQuests() {
   if (!active.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">⚔️</div>Квестов пока нет</div>'; return; }
   el.innerHTML = active.map(q => {
     const dl = formatDeadline(q.deadline);
-    const overdue = q.deadline && new Date(q.deadline) < new Date();
+    const isActiveQuest = q.board_status === 'active' || (!q.board_status && q.status === 'active');
+    const overdue = isActiveQuest && q.deadline && new Date(q.deadline) < new Date();
     const overdueStyle = overdue ? 'border:1px solid var(--red);border-radius:var(--radius-sm);padding:8px;margin-bottom:2px;background:rgba(255,79,107,0.05);' : '';
     return `<div class="quest-item" onclick="openDetail(${q.id})" style="${overdueStyle}">
       <div class="quest-cb"></div>
@@ -904,11 +905,12 @@ async function changeStatus(newStatus) {
       // Левелап
       if (newXp >= PLAYER.xp_to_next) { newXp -= PLAYER.xp_to_next; newLevel++; leveled = true; }
     } else {
-      // Не уходим в минус на текущем уровне
+      // Понижение XP
       if (newXp < 0) {
         if (newLevel > 1) {
           newLevel--;
-          newXp = (newLevel * 100) + newXp;
+          const prevLevelMax = newLevel * 100;
+          newXp = prevLevelMax + newXp; // newXp отрицательный, поэтому вычитаем
           if (newXp < 0) newXp = 0;
         } else {
           newXp = 0;
@@ -1189,7 +1191,7 @@ function renderKanban() {
     }
     container.innerHTML = cards.map(q => {
       const dl = formatDeadline(q.deadline);
-      const overdue = q.deadline && new Date(q.deadline) < new Date();
+      const overdue = (s === 'active') && q.deadline && new Date(q.deadline) < new Date();
       return `<div class="kanban-card" draggable="true" data-id="${q.id}"
         ondragstart="onDragStart(event,${q.id})"
         ondragend="onDragEnd(event)"
@@ -1381,8 +1383,12 @@ async function updateQuestStatus(questId, newStatus) {
       if (newXp >= PLAYER.xp_to_next) { newXp -= PLAYER.xp_to_next; newLevel++; leveled = true; }
     } else {
       if (newXp < 0) {
-        if (newLevel > 1) { newLevel--; newXp = (newLevel * 100) + newXp; if (newXp < 0) newXp = 0; }
-        else newXp = 0;
+        if (newLevel > 1) {
+          newLevel--;
+          const prevLevelMax = newLevel * 100;
+          newXp = prevLevelMax + newXp;
+          if (newXp < 0) newXp = 0;
+        } else { newXp = 0; }
       }
     }
     await api('players?id=eq.' + PLAYER.id, { method: 'PATCH', body: JSON.stringify({ xp: newXp, level: newLevel, xp_to_next: newLevel * 100 }) });
