@@ -138,9 +138,9 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
 .legend-val { color: var(--text); font-weight: 600; margin-left: 2px; }
 
 /* ── KANBAN ── */
-.kanban-page { flex: 1; overflow-x: auto; overflow-y: hidden; display: none; }
+.kanban-page { flex: 1; overflow: auto; display: none; }
 .kanban-page.active { display: block; }
-.kanban-scroll { display: flex; gap: 10px; padding: 12px 14px 80px; min-height: calc(100vh - 120px); width: max-content; min-width: 100%; }
+.kanban-scroll { display: flex; gap: 10px; padding: 12px 14px 80px; width: max-content; min-width: 100%; min-height: calc(100vh - 120px); }
 .kanban-col { width: 220px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
 .kanban-col-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; }
 .kanban-col-header.active-col { background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent); }
@@ -155,8 +155,9 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-sm); padding: 10px 12px;
   cursor: grab; user-select: none; transition: all 0.15s;
-  touch-action: none;
+  touch-action: auto;
 }
+.kanban-card.is-dragging { touch-action: none; }
 .kanban-card:active { cursor: grabbing; opacity: 0.8; transform: scale(0.97); }
 .kanban-card.dragging { opacity: 0.4; }
 .kanban-card-title { font-size: 13px; color: var(--text); line-height: 1.4; margin-bottom: 7px; }
@@ -1261,6 +1262,7 @@ function addTouchDrag(card) {
     if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
     stopScroll();
     card.classList.remove('dragging');
+    card.classList.remove('is-dragging');
     card.style.transform = '';
     if (clone) { clone.remove(); clone = null; }
     document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over'));
@@ -1277,6 +1279,7 @@ function addTouchDrag(card) {
     // Longpress 300ms before drag starts
     longPressTimer = setTimeout(() => {
       isDragging = true;
+      card.classList.add('is-dragging');
       clone = card.cloneNode(true);
       clone.style.cssText = `position:fixed;width:${card.offsetWidth}px;opacity:0.85;z-index:999;pointer-events:none;transform:rotate(2deg) scale(1.03);box-shadow:0 8px 24px rgba(0,0,0,0.4);transition:none;`;
       clone.style.left = (startX - card.offsetWidth/2) + 'px';
@@ -1323,6 +1326,7 @@ function addTouchDrag(card) {
     if (isDragging) {
       isDragging = false;
       card.classList.remove('dragging');
+      card.classList.remove('is-dragging');
       document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over'));
       const el = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
       const col = el?.closest('.kanban-cards');
